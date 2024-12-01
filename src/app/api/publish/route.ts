@@ -2,18 +2,17 @@ import { auth } from "@/auth";
 import dbConnect from "@/lib/dbConnect";
 import PostModel from "@/models/post.model";
 import { ApiResponse } from "@/types/ApiResponse";
-import mongoose from "mongoose";
 
 
 
-export async function POST(request: Request) {
+
+export async function GET(request: Request) {
     // Connect to the database
     await dbConnect();
+    console.log("hello")
     try {
         const session = await auth();
 
-       
-        
         if (!session) {
             const response: ApiResponse = {
                 status: 401,
@@ -23,51 +22,46 @@ export async function POST(request: Request) {
             return Response.json(response, { status: 401 });
         }
         const user = session.user;
-        console.log("user: ", user);
-        const { title, content, isPublished, slug } = await request.json();
-
-        if (!title || !content || !slug) {
+        
+        const url = new URL(request.url);
+        const id = url.searchParams.get("id");
+        
+        if(!id){
             const response: ApiResponse = {
                 status: 400,
                 success: false,
-                message: "All fields are required",
+                message: "Id is required",
             }
             return Response.json(response, { status: 400 });
         }
 
-
-        // Create a new blog post
-        console.log(`Creating new blog post`);
-        const newPost = await PostModel.create({
-            title,
-            content,
-            isPublished: Boolean(isPublished),
-            slug,
-            author: new  mongoose.Types.ObjectId(user._id),
-        });
-        console.log(`Created new blog post`);
-
-        if (!newPost) {
+        const post = await PostModel.findById(id);
+        if(!post){
             const response: ApiResponse = {
-                status: 500,
+                status: 404,
                 success: false,
-                message: "Failed to create post",
+                message: "Post not found",
             }
-            return Response.json(response, { status: 500 });
+            return Response.json(response, { status: 404 });
         }
+        post.isPublished = !post.isPublished;
+        await post.save();
+
         const response: ApiResponse = {
-            status: 201,
+            status: 200,
             success: true,
-            message: "Post created successfully",
-            data: newPost,
+            message: "Post published successfully",
+            data: post,
         }
-        return Response.json(response, { status: 201 });
+        return Response.json(response, { status: 200 });
+
+        
     } catch (error) {
         console.log(error);
         const response: ApiResponse = {
             status: 500,
             success: false,
-            message: "Error creating post",
+            message: "Error publishing post",
             error: error?.message,
         }
         return Response.json(response, { status: 500 });

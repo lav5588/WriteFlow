@@ -4,9 +4,13 @@ import axios from "axios";
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react";
 import CreateBlog from "../../create-blog/page";
+import { useDispatch } from "react-redux";
+import { setIsPublished } from "@/components/store/slices/blogSlice";
 
 
 const Page = () => {
+  
+  const dispatch = useDispatch();
   const params = useParams();
   const [data, setData] = useState(null)
   useEffect(() => {
@@ -18,6 +22,7 @@ const Page = () => {
           return;
         }
         setData(response.data)
+        dispatch(setIsPublished(data?.isPublished));
         console.log("Fetched draft: ", response.data);
 
       }
@@ -39,5 +44,7 @@ const Page = () => {
     </div>
   )
 }
+
+
 
 export default Page

@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/mode-toggle";
 import { SessionProvider } from "next-auth/react";
+import StoreProvider from "@/components/store/storeProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -37,12 +38,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <StoreProvider>
           <SessionProvider>
 
             <ModeToggle />
             {children}
           </SessionProvider>
-
+          </StoreProvider>
         </ThemeProvider>
       </body>
     </html>

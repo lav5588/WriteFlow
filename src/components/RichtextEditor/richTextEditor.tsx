@@ -6,7 +6,7 @@ import ListItem from '@tiptap/extension-list-item'
 import TextStyle from '@tiptap/extension-text-style'
 import { EditorProvider, useCurrentEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ChromePicker } from 'react-color' // Importing the Chrome color picker
 import { Button } from '../ui/button'
 import {
@@ -19,14 +19,18 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 
+import { useSelector} from 'react-redux'
 
-const MenuBar = ({ onSave , isUpdate, onUpdate}) => {
+
+const MenuBar = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
 
     const { editor } = useCurrentEditor()
     const [color, setColor] = useState('#000000') // Default color
     const [savingContent, setSavingContent] = useState(false)
     const [publishingContent, setPublishingContent] = useState(false)
     const [updatingContent, setUpdatingContent] = useState(false)
+   
+    const isPublished = useSelector(state => state.blogReducer.isPublished);
 
     if (!editor) {
         return null
@@ -67,6 +71,20 @@ const MenuBar = ({ onSave , isUpdate, onUpdate}) => {
 
         await onUpdate(formattedHTML);
         setUpdatingContent(false)
+    }
+    const handlePublish: React.MouseEventHandler<HTMLButtonElement> | undefined = async () => {
+        setPublishingContent(true)
+        console.log("getText(): ", editor.getText())
+        if (editor.getText().trim() === '') {
+            console.log("Content is empty")
+            return
+        }
+        console.log("getHTML(): ", editor.getHTML())
+        const formattedHTML = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
+
+        console.log("formatted: ", formattedHTML)
+        await onTogglePublish(formattedHTML);
+        setPublishingContent(false)
     }
 
 
@@ -211,7 +229,7 @@ const MenuBar = ({ onSave , isUpdate, onUpdate}) => {
                 >
                     <Redo2 />
                 </Button>
-                { !isUpdate && <Button
+                {!isUpdate && <Button
                     disabled={savingContent}
                     onClick={handleSave}
                 >
@@ -220,7 +238,7 @@ const MenuBar = ({ onSave , isUpdate, onUpdate}) => {
                     }
 
                 </Button>}
-                { isUpdate && <Button
+                {isUpdate && <Button
                     disabled={savingContent}
                     onClick={handleUpdate}
                 >
@@ -229,14 +247,22 @@ const MenuBar = ({ onSave , isUpdate, onUpdate}) => {
                     }
 
                 </Button>}
-                <Button
+                {!isPublished && <Button
                     disabled={publishingContent}
-                    onClick={() => setPublishingContent(!publishingContent)}
+                    onClick={handlePublish}
                 >
                     {
                         publishingContent ? <><Loader2 className='animate-spin' /> Publishing</> : <><Send />Publish</>
                     }
-                </Button>
+                </Button>}
+                {isPublished && <Button
+                    disabled={publishingContent}
+                    onClick={handlePublish}
+                >
+                    {
+                        publishingContent ? <><Loader2 className='animate-spin' /> UnPublishing</> : <><Send />UnPublish</>
+                    }
+                </Button>}
             </div>
         </div>
     )
@@ -261,10 +287,16 @@ const extensions = [
 //   Write What is in Your mind
 // `
 
-const RichTextEditor = ({ onSave ,content, isUpdate, onUpdate}) => {
+const RichTextEditor = ({ onSave, content, isUpdate, onUpdate, isPublished, onTogglePublish }) => {
     return (
 
-        <EditorProvider slotBefore={<MenuBar onSave={onSave} isUpdate = {isUpdate} onUpdate = {onUpdate}/>} extensions={extensions} content={content}></EditorProvider>
+        <EditorProvider slotBefore={<MenuBar
+            onSave={onSave}
+            isUpdate={isUpdate}
+            onUpdate={onUpdate}
+            isPublished={isPublished}
+            onTogglePublish={onTogglePublish}
+        />} extensions={extensions} content={content}></EditorProvider>
     )
 }
 

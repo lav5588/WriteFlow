@@ -1,18 +1,27 @@
 'use client'
 
 import RichTextEditor from "@/components/RichtextEditor/richTextEditor"
+import { setIsPublished } from "@/components/store/slices/blogSlice"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { blogSchema } from "@/schemas/blogSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
+import { Save } from "lucide-react"
 import React from "react"
 import { useForm } from "react-hook-form"
+import { useDispatch } from "react-redux"
 import { z } from "zod"
 
 
 
-const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', isPublished = false, content = 'Whats on your mind', isUpdate = false ,id = null }) => {
+
+
+
+const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', isPublished = false, content = 'Whats on your mind', isUpdate = false, id = null }) => {
+
+
+    const dispatch = useDispatch();
 
 
     const slugValidation = z
@@ -40,7 +49,7 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', isPublishe
     })
 
     const form = useForm<z.infer<typeof blogSchema>>({
-        resolver: zodResolver(isUpdate?updateBlogSchema:blogSchema),
+        resolver: zodResolver(isUpdate ? updateBlogSchema : blogSchema),
         defaultValues: {
             title,
             slug,
@@ -67,6 +76,7 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', isPublishe
                 console.log('Error saving blog data', response);
                 return;
             }
+            return response;
             console.log('isValid: ', isValid);
         } catch (error) {
 
@@ -90,12 +100,12 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', isPublishe
     }
 
     const onUpdate = async (content) => {
-        // TODO: logic for update the data
         const data = { ...form.getValues(), content: content, isPublished: isPublished };
+        console.log("data:",data);
         try {
             const isValid = await updateBlogSchema.parseAsync(data);
             //save the isvalid data to db
-            const response = await axios.post('/api/update-blog', {...isValid,id});
+            const response = await axios.post('/api/update-blog', { ...isValid, id });
             console.log("response: ", response);
             if (!response) {
                 console.log('Error updating blog data', response);
@@ -103,7 +113,7 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', isPublishe
             }
             console.log('isValid: ', isValid);
         } catch (error) {
-
+            console.log('Error', error);
             try {
                 const Error = JSON.parse(error)
                 Error.forEach((err) => {
@@ -122,6 +132,32 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', isPublishe
         }
 
     };
+
+    const onTogglePublish = async (content) => {
+        try {
+            // console.log("hello");
+            if(!id){
+                const res = await onSave(content);
+                id = res?.data._id;
+            }
+            else{
+                await onUpdate(content);
+            }
+            const response = await axios.get('/api/publish', {  params: { id } });
+            if (!response) {
+                console.log('Error publishing blog', response);
+                return;
+            }
+            isPublished = response?.data.data.isPublished;
+            dispatch(setIsPublished(isPublished));
+            console.log('published', isPublished);
+            console.log('Blog published successfully', response);
+
+        }
+        catch (err) {
+            console.log(err);
+        }
+    }
 
     return (
         <div className="flex justify-center">
@@ -168,7 +204,7 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', isPublishe
                         </form>
                     </Form>
                 </div>
-                <RichTextEditor onSave={onSave} content={content} isUpdate={isUpdate} onUpdate={onUpdate} />
+                <RichTextEditor onSave={onSave} content={content} isUpdate={isUpdate} onUpdate={onUpdate} isPublished = {isPublished} onTogglePublish = {onTogglePublish}/>
             </div>
 
         </div>
