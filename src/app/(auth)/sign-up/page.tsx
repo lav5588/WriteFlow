@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { signUpSchema } from "@/schemas/signUpSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
+import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -91,6 +92,7 @@ const page = () => {
                     <Button type="submit" >Submit</Button>
                 </form>
             </Form>
+            Already have an account? <Link href={'/sign-in'} className="underline">SignIn</Link>
         </div>
     )
 }

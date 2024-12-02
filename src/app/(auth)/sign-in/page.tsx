@@ -6,8 +6,9 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Input } from "@/components/ui/input"
 import { signInSchema } from "@/schemas/signInSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { signIn, useSession } from 'next-auth/react';
-import { useEffect } from "react"
+import { signIn } from 'next-auth/react';
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 
 import { useForm } from "react-hook-form"
@@ -15,7 +16,7 @@ import { z } from "zod"
 
 
 const page = () => {
-
+    const router = useRouter();
     const form = useForm<z.infer<typeof signInSchema>>({
         resolver: zodResolver(signInSchema),
         defaultValues: {
@@ -24,23 +25,26 @@ const page = () => {
         }
     });
 
-    const session = useSession() 
 
-   console.log("session: ",session);
+    const onSubmit = async (values: z.infer<typeof signInSchema>) => {
+        try {
+            await signIn("credentials", {
+                ...values,
+                redirect:false,
+            })
+            router.push('/');
 
-    //TODO:
-    const onSubmit = async(values: z.infer<typeof signInSchema>) => {
-        // TODO: do the network call
-        console.log(values);
-        const result = await signIn("credentials", values)
-        console.log(result);
+        }
+        catch (error) {
+            console.log("sign in error", error);
+        }
     };
 
     return (
         <div className="flex justify-center flex-col items-center">
             <h1>SIGN IN</h1>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <Form {...form} >
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 mb-12">
                     <FormField
                         control={form.control}
                         name="identifier"
@@ -69,6 +73,7 @@ const page = () => {
                     <Button type="submit" >Submit</Button>
                 </form>
             </Form>
+            Don't have an account? <Link href={'/sign-up'} className="underline">SignUp</Link>
         </div>
     )
 }

@@ -14,7 +14,7 @@ export async function GET(req: Request, context: { params: { slug: string } }) {
             return NextResponse.json({ error: "Slug is required" }, { status: 400 });
         }
 
-        const blogs = await PostModel.findOne({ slug: slug})
+        const blogs = await PostModel.findOne({ slug: slug,isPublished: true });
         if(!blogs) {
             return NextResponse.json({ error: "Blog not found" }, { status: 404 });
         }

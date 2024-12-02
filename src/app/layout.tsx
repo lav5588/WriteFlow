@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ModeToggle } from "@/components/mode-toggle";
 import { SessionProvider } from "next-auth/react";
 import StoreProvider from "@/components/store/storeProvider";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased `}
       >
         <ThemeProvider
           attribute="class"
@@ -39,11 +40,15 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <StoreProvider>
-          <SessionProvider>
+            <SessionProvider>
 
-            <ModeToggle />
-            {children}
-          </SessionProvider>
+              <Navbar />
+              <div className="min-h-[70vh]">
+
+                {children}
+              </div>
+              <Footer />
+            </SessionProvider>
           </StoreProvider>
         </ThemeProvider>
       </body>

@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useParams } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Drafts from '@/components/userTabs/drafts';
+import Published from '@/components/userTabs/Published';
 
 
 
@@ -66,7 +67,9 @@ const Page = () => {
               <TabsContent value="draft">
                 <Drafts />
               </TabsContent>
-              <TabsContent value="published">Change your published content here.</TabsContent>
+              <TabsContent value="published">Change your published content here.
+                <Published username={params.username}/>
+              </TabsContent>
             </Tabs>
           </div>
         </div>

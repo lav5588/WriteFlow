@@ -6,7 +6,7 @@ import { ApiResponse } from "@/types/ApiResponse";
 export async function GET(request: Request){
     await dbConnect();
     try{
-        const blogs = await PostModel.find({});
+        const blogs = await PostModel.find({isPublished:true});
         if(!blogs){
             const response:ApiResponse = {
                 status: 500,

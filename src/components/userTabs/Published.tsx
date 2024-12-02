@@ -13,49 +13,53 @@ const truncateHTML = (html: string, maxLength: number) => {
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 
-const Page = () => {
+const Published = ({ username }) => {
     const [data, setData] = useState([])
     const router = useRouter();
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('/api/blogs');
+                // console.log(username);
+                const response = await axios.get(`/api/blogs/blogs-by-username?username=${username}`);
                 console.log("Data fetched: ", response);
-                setData(response.data.data);
+                setData(response.data.post);
             } catch (error) {
                 console.log("Error in fetching data: ", error);
             }
         }
-        fetchData()
+        if (username) {
+            fetchData()
+        }
+
     }, [])
 
-    if (!data || data.length == 0) {
-        return <div>There is no blogs</div>
+    if (data.length == 0) {
+        return <div>There is no drafts</div>
     }
 
     const handleClick = (slug) => {
-        router.push(`blogs/${slug}`)
+        router.push(`/blogs/${slug}`)
     };
 
     return (
-        <>
-            <h1 className="text-center font-extrabold text-3xl mb-5">Blogs</h1>
+        <div className="mt-5">
+            <h1 className="text-center font-extrabold text-3xl mb-5">Drafts</h1>
             <div className="flex flex-wrap gap-5  justify-center items-center">
-                {data.map((blog) => (
+                {data && data?.map((blog) => (
                     <Card key={blog._id} className="h-[20rem]  w-[20rem]" onClick={() => { handleClick(blog.slug) }}>
                         <CardHeader>
                             <CardTitle className="leading-6" ><h5>{blog.title.toUpperCase()}</h5></CardTitle>
                         </CardHeader>
                         <CardContent >
                             <div
-                                dangerouslySetInnerHTML={{ __html: truncateHTML(blog.content,200) }}
+                                dangerouslySetInnerHTML={{ __html: truncateHTML(blog.content, 200) }}
                             />
                         </CardContent>
                     </Card>
                 ))}
             </div>
-        </>
+        </div>
     )
 }
 
-export default Page
+export default Published
