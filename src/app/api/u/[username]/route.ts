@@ -5,10 +5,10 @@ import UserModel from '@/models/user.model';
 import { NextResponse } from 'next/server';
 
 
-export async function GET(req: Request, context: { params: { username: string } }) {
+export async function GET(req: Request, {params}: { params: Promise<{ username: string ;}> }) {
     await dbConnect();
     try {
-        const { username } = await context.params;
+        const username = (await params).username;
 
         if (!username) {
             return NextResponse.json({ messsage: "username is required" }, { status: 200 });
