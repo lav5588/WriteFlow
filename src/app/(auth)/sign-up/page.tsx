@@ -7,12 +7,13 @@ import { signUpSchema } from "@/schemas/signUpSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 
 const page = () => {
-
+    const router = useRouter();
     const form = useForm<z.infer<typeof signUpSchema>>({
         resolver: zodResolver(signUpSchema),
         defaultValues: {
@@ -26,10 +27,12 @@ const page = () => {
     //TODO:
     const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
         console.log(values);
-        // TODO: do the network call
         try {
             const response = await axios.post('/api/sign-up', values)
-            console.log(response);
+            if(!response){
+                console.log('Error signing up user', response);
+            }
+            router.push(`/verify/${values.username}`)
         }
         catch (error) {
             console.error(error);
