@@ -25,7 +25,7 @@ const Page = () => {
         }
         fetchBlog()
 
-    }, [])
+    }, [params.slug])
 
     return (
         <div className="flex justify-center">
