@@ -34,7 +34,7 @@ const Published = ({ username }) => {
     }, [])
 
     if (data.length == 0) {
-        return <div>There is no drafts</div>
+        return <div>There is no published content</div>
     }
 
     const handleClick = (slug) => {

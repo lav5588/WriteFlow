@@ -19,7 +19,7 @@ export async function GET(request: Request) {
         }
 
         if (unPublishedBlogs.length == 0) {
-            return NextResponse.json({ "message": "You have not any draft" }, { status: 200 })
+            return NextResponse.json({ "message": "You have not any draft" }, { status: 404 })
         }
 
         return NextResponse.json(unPublishedBlogs , { status: 200 })
