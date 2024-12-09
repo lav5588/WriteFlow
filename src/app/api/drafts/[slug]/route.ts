@@ -29,9 +29,6 @@ export async function GET(req: Request, context: { params: { slug: string } }) {
         return NextResponse.json({ message: "Not able to fetch User", error: error }, { status: 200 });
     }
 
-
-
-
 }
 
 

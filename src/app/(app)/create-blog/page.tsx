@@ -138,7 +138,8 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', isPublishe
             // console.log("hello");
             if(!id){
                 const res = await onSave(content);
-                id = res?.data._id;
+                id = res?.data.data._id;
+                console.log("id: ",res.data.data._id);
             }
             else{
                 await onUpdate(content);
