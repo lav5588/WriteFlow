@@ -22,7 +22,7 @@ const Page = () => {
           return;
         }
         setData(response.data)
-        dispatch(setIsPublished(data?.isPublished));
+        dispatch(setIsPublished(response.data?.isPublished));
         console.log("Fetched draft: ", response.data);
 
       }
@@ -40,7 +40,7 @@ const Page = () => {
 
   return (
     <div>
-      <CreateBlog title={data.title} slug={data.slug} content={data.content} isUpdate={true} id = {data._id}/>
+      <CreateBlog title={data.title} slug={data.slug} content={data.content} isUpdate={true} id = {data._id} />
     </div>
   )
 }

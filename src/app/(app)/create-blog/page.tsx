@@ -10,7 +10,7 @@ import axios from "axios"
 import { Save } from "lucide-react"
 import React from "react"
 import { useForm } from "react-hook-form"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { z } from "zod"
 
 
@@ -18,11 +18,11 @@ import { z } from "zod"
 
 
 
-const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', isPublished = false, content = 'Whats on your mind', isUpdate = false, id = null }) => {
+const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 'Whats on your mind', isUpdate = false, id = null }) => {
 
 
     const dispatch = useDispatch();
-
+    const isPublished = useSelector(state => state.blogReducer.isPublished);
 
     const slugValidation = z
         .string()
@@ -66,7 +66,7 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', isPublishe
     }
 
     const onSave = async (content) => {
-        const data = { ...form.getValues(), content: content, isPublished: false }
+        const data = { ...form.getValues(), content: content, isPublished }
         try {
             const isValid = await blogSchema.parseAsync(data);
             //save the isvalid data to db
@@ -100,7 +100,7 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', isPublishe
     }
 
     const onUpdate = async (content) => {
-        const data = { ...form.getValues(), content: content, isPublished: isPublished };
+        const data = { ...form.getValues(), content: content,isPublished:isPublished };
         console.log("data:",data);
         try {
             const isValid = await updateBlogSchema.parseAsync(data);
@@ -136,6 +136,7 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', isPublishe
     const onTogglePublish = async (content) => {
         try {
             // console.log("hello");
+            console.log(id)
             if(!id){
                 const res = await onSave(content);
                 id = res?.data.data._id;
@@ -149,10 +150,9 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', isPublishe
                 console.log('Error publishing blog', response);
                 return;
             }
-            isPublished = response?.data.data.isPublished;
-            dispatch(setIsPublished(isPublished));
+            dispatch(setIsPublished(response?.data.data.isPublished));
             console.log('published', isPublished);
-            console.log('Blog published successfully', response);
+            console.log(`Blog ${isPublished?'published':'unpublished'} successfully`, response);
 
         }
         catch (err) {

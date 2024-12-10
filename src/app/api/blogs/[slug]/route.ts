@@ -1,3 +1,4 @@
+import { auth } from '@/auth';
 import dbConnect from '@/lib/dbConnect';
 import PostModel from '@/models/post.model';
 import { NextResponse } from 'next/server';
@@ -18,11 +19,25 @@ export async function GET(request: Request,
 
         const blog = await PostModel.findOne({ slug, isPublished: true });
 
-        if (!blog) {
+        if(blog){
+            return NextResponse.json(blog, { status: 200 });
+        }
+
+        const session = await auth()
+
+        if (!session) {
             return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
         }
 
-        return NextResponse.json(blog, { status: 200 });
+        const userBlog = await PostModel.findOne({ slug, author: session.user._id });
+
+        if (!userBlog) {
+            return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
+        }
+
+        return NextResponse.json(userBlog, { status: 200 });
+
+        
     } catch (error) {
         return NextResponse.json({ error: (error as Error).message }, { status: 500 });
     }

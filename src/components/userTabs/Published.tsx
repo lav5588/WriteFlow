@@ -21,22 +21,41 @@ const AlertBox = () => {
 const Published = ({ username }) => {
     const [data, setData] = useState([])
     const router = useRouter();
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // console.log(username);
-                const response = await axios.get(`/api/blogs/blogs-by-username?username=${username}`);
-                console.log("Data fetched: ", response);
-                setData(response.data.post);
-            } catch (error) {
-                console.log("Error in fetching data: ", error);
-            }
+
+
+    const fetchData = async () => {
+        try {
+            // console.log(username);
+            const response = await axios.get(`/api/blogs/blogs-by-username?username=${username}`);
+            console.log("Data fetched: ", response);
+            setData(response.data.post);
+        } catch (error) {
+            console.log("Error in fetching data: ", error);
         }
+    }
+    
+    useEffect(() => {
+       
         if (username) {
             fetchData()
         }
 
     }, [])
+
+
+    const handleDelete = async (slug) => {
+        try {
+            const response = await axios.delete(`/api/delete-blog/${slug}`); 
+            if(!response){
+                console.log("Error in deleting blog");
+            }
+            console.log("response: " , response)
+            fetchData();
+        }
+        catch (error) {
+            console.log("Error in deleting data: ", error);
+        }
+    }
 
     if (data.length == 0) {
         return <div>There is no published content</div>
@@ -45,6 +64,35 @@ const Published = ({ username }) => {
     const handleClick = (slug) => {
         router.push(`/blogs/${slug}`)
     };
+
+    const handleEdit = (slug) => {
+        router.push(`/draft/${slug}`)
+    };
+
+
+    const handleUnpublish = async (id) => {
+        try {
+            // console.log("hello");
+            if(!id){
+                console.log("id is required");
+                throw new Error("Id is required");
+            }
+            
+            const response = await axios.get('/api/publish', {  params: { id } });
+            if (!response) {
+                console.log('Error publishing blog', response);
+                return;
+            }
+            console.log('Blog Unpublished successfully', response);
+            fetchData();
+        }
+        catch (err) {
+            console.log(err);
+        }
+    }
+
+   
+ 
 
     return (
         <div className="mt-5">
@@ -59,12 +107,12 @@ const Published = ({ username }) => {
                                     <EllipsisVertical />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
-                                    <DropdownMenuItem><GalleryThumbnails />View</DropdownMenuItem>
-                                    <DropdownMenuItem><Pencil />Edit</DropdownMenuItem>
-                                    <DropdownMenuItem><Undo2 />Unpublish</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => { handleClick(blog.slug) }}><GalleryThumbnails />View</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={()=>handleEdit(blog.slug)}><Pencil />Edit</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={()=> handleUnpublish(blog._id)}><Undo2 />Unpublish</DropdownMenuItem>
                                     <DropdownMenuItem className="text-red-400" onClick={(e)=>e.preventDefault()}>
                                         <AlertDialog>
-                                            <AlertDialogTrigger className="flex justify-center items-end"><Trash2 className="w-4"/>&nbsp;Delete</AlertDialogTrigger>
+                                            <AlertDialogTrigger className="flex justify-center items-end" ><Trash2 className="w-4"/>&nbsp;Delete</AlertDialogTrigger>
                                             <AlertDialogContent>
                                                 <AlertDialogHeader>
                                                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -75,7 +123,7 @@ const Published = ({ username }) => {
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction>Continue</AlertDialogAction>
+                                                    <AlertDialogAction onClick={()=>handleDelete(blog.slug)}>Continue</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>
@@ -84,7 +132,7 @@ const Published = ({ username }) => {
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent onClick={() => { handleClick(blog.slug) }}>
                             <div
                                 dangerouslySetInnerHTML={{ __html: truncateHTML(blog.content, 200) }}
                             />
