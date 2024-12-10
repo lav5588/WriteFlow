@@ -18,10 +18,6 @@ export async function GET(request: Request) {
             return NextResponse.json({ "message": "Something went wrong in finding the draft" }, { status: 200 })
         }
 
-        if (unPublishedBlogs.length == 0) {
-            return NextResponse.json({ "message": "You have not any draft" }, { status: 404 })
-        }
-
         return NextResponse.json(unPublishedBlogs , { status: 200 })
     }
     catch (error) {

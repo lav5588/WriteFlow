@@ -72,7 +72,8 @@ const MenuBar = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
         await onUpdate(formattedHTML);
         setUpdatingContent(false)
     }
-    const handlePublish: React.MouseEventHandler<HTMLButtonElement> | undefined = async () => {
+    const handlePublish: React.MouseEventHandler<HTMLButtonElement> | undefined = async (e) => {
+        e.preventDefault(); 
         setPublishingContent(true)
         console.log("getText(): ", editor.getText())
         if (editor.getText().trim() === '') {
