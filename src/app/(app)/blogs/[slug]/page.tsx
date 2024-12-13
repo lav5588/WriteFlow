@@ -29,7 +29,7 @@ const Page = () => {
 
     return (
         <div className="flex justify-center">
-            <Card className="w-[60vw]  leading-7 min-w-[20rem] p-5">
+            <Card className="md:w-[60vw] w-[98vw]  leading-7 min-w-[20rem] p-5">
                 {blog && <h1 className="text-3xl text-center text-cyan-500 mb-5">{blog.title.toUpperCase()}</h1>}
                 {blog && (
                     <div

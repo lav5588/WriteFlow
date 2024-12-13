@@ -42,8 +42,8 @@ export default function RootLayout({
           <StoreProvider>
             <SessionProvider>
 
+              <div className="min-h-[70vh] min-w-[400px]">
               <Navbar />
-              <div className="min-h-[70vh]">
 
                 {children}
               </div>

@@ -198,7 +198,7 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
 
     return (
         <div className="flex justify-center">
-            <div className="w-[60%]">
+            <div className="md:w-[70%] w-[95%]">
                 <h1>Write Your Blog</h1>
                 <div className="mb-5">
                     <Form {...form} >

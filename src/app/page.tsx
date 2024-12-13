@@ -21,8 +21,8 @@ const Hero = () => (
 
     {/* Read Blogs Section */}
     <div className="flex flex-col md:flex-row items-center  px-10 py-10">
-      {/* Placeholder for Image/Color */}
-      <div className="w-full md:w-1/2 h-80 ">
+      {/* Placeholder for image/Color */}
+      <div className="w-full md:w-1/2">
         <Image src={'/HeroSvgs/read.svg'} width={500} alt={"Create"} height={300}></Image>
       </div>
       {/* Content */}
@@ -42,7 +42,7 @@ const Hero = () => (
     {/* Write Blogs Section */}
     <div className="flex flex-col md:flex-row-reverse items-center px-10 py-10">
       {/* Placeholder for Image/Color */}
-      <div className="w-full md:w-1/2 h-80 ">
+      <div className="w-full md:w-1/2 ">
         <Image src={'/HeroSvgs/write.png'} width={500} alt={"Create"} height={300}></Image>
       </div>
       {/* Content */}
@@ -59,9 +59,9 @@ const Hero = () => (
     </div>
 
     {/* About Us Section */}
-    <div className="flex flex-col md:flex-row items-centerpx-10 py-10">
+    <div className="flex flex-col md:flex-row gap-8 items-centerpx-10 py-10">
       {/* Placeholder for Image/Color */}
-      <div className="w-full md:w-1/2 h-80">
+      <div className="w-full md:w-1/2">
         <Image src={'/HeroSvgs/about.png'} width={500} alt={"Create"} height={300}></Image>
       </div>
       {/* Content */}
@@ -81,7 +81,7 @@ const Hero = () => (
     {/* Contact Us Section */}
     <div className="flex flex-col md:flex-row-reverse items-center  px-10 py-10">
       {/* Placeholder for Image/Color */}
-      <div className="w-full md:w-1/2 h-80 ">
+      <div className="w-full md:w-1/2 ">
         <Image src={'/HeroSvgs/contact.png'} width={500} alt={"Create"} height={300}></Image>
       </div>
       {/* Content */}
@@ -100,7 +100,7 @@ const Hero = () => (
     {/* Community Section */}
     <div className="flex flex-col md:flex-row items-center  px-10 py-10">
       {/* Placeholder for Image/Color */}
-      <div className="w-full md:w-1/2 h-64">
+      <div className="w-full md:w-1/2 ">
         <Image src={'/HeroSvgs/join.png'} width={500} alt={"Create"} height={300}></Image>
       </div>
       {/* Content */}
