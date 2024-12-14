@@ -15,7 +15,9 @@ export const Navbar = () => {
     const session = useSession()
     const handleLogout = async () => {
         try {
-            await signOut();
+            await signOut({
+                redirect:false
+            });
         } catch (error) {
             console.log("error: " + error);
         }

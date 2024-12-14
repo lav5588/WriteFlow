@@ -28,15 +28,19 @@ const page = () => {
 
     const onSubmit = async (values: z.infer<typeof signInSchema>) => {
         try {
-            await signIn("credentials", {
+            const response = await signIn("credentials", {
                 ...values,
                 redirect:false,
             })
+            console.log("SignIn response: ", response);
+            if(response.error){
+                throw new Error(response.error);
+            }
             router.push('/');
 
         }
         catch (error) {
-            console.log("sign in error", error);
+            console.error("sign in error", error);
         }
     };
 
