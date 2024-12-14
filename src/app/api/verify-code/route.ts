@@ -17,7 +17,7 @@ export async function POST(request: Request) {
                 success: false,
                 message: 'User not found'
             }
-            return Response.json(response);
+            return Response.json(response, { status: 404});
         }
 
         // Check if the code is correct and not expired
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
                 success: true,
                 message: 'Account verified successfully'
             }
-            return Response.json(response);
+            return Response.json(response,{status:200});
 
         } else if (!isCodeNotExpired) {
             // Code has expired
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
                 success: false,
                 message: 'Verification code has expired. Please sign up again to get a new code.',
             }
-            return Response.json(response);
+            return Response.json(response,{status:400});
 
         } else {
             // Code is incorrect
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
                 success: false,
                 message: 'Incorrect verification code',
             }
-            return Response.json(response);
+            return Response.json(response,{status:400});
 
         }
     } catch (error) {
@@ -63,6 +63,6 @@ export async function POST(request: Request) {
             message: 'Error verifying user',
             error: error,
         }
-        return Response.json(response);
+        return Response.json(response,{status:400});
     }
 }

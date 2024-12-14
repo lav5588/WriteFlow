@@ -11,13 +11,11 @@ import { User } from "lucide-react";
 
 
 export const Navbar = () => {
-
+    
     const session = useSession()
     const handleLogout = async () => {
         try {
-            await signOut({
-                callbackUrl: '/',
-            });
+            await signOut();
         } catch (error) {
             console.log("error: " + error);
         }

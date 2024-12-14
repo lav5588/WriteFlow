@@ -6,7 +6,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { veryfyCodeSchema } from "@/schemas/verifyCodeSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -14,6 +14,7 @@ import { z } from "zod"
 const page = () => {
 
     const params = useParams();
+    const router = useRouter()
 
     const form = useForm<z.infer<typeof veryfyCodeSchema>>({
         resolver: zodResolver(veryfyCodeSchema),
@@ -30,6 +31,7 @@ const page = () => {
         try {
             const response = await axios.post('/api/verify-code',data);
             console.log(response);
+            router.push('/sign-in')
         } catch (error) {
             console.log("user verification error",error);
         }

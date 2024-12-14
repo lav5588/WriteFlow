@@ -17,7 +17,7 @@ export async function GET(request: Request,
             return NextResponse.json({ error: 'Slug is required' }, { status: 400 });
         }
 
-        const blog = await PostModel.findOne({ slug, isPublished: true });
+        const blog = await PostModel.findOne({ slug, isPublished: true }).populate('author');
 
         if(blog){
             return NextResponse.json(blog, { status: 200 });
@@ -29,7 +29,7 @@ export async function GET(request: Request,
             return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
         }
 
-        const userBlog = await PostModel.findOne({ slug, author: session.user._id });
+        const userBlog = await PostModel.findOne({ slug, author: session.user._id }).populate('author');
 
         if (!userBlog) {
             return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
