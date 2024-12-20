@@ -6,6 +6,7 @@ import { SessionProvider } from "next-auth/react";
 import StoreProvider from "@/components/store/storeProvider";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import WithAuth from "@/middlewareWraper";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -41,13 +42,14 @@ export default function RootLayout({
         >
           <StoreProvider>
             <SessionProvider>
-
+              <WithAuth>
               <div className="min-h-[70vh] min-w-[400px]">
               <Navbar />
 
                 {children}
               </div>
               <Footer />
+              </WithAuth>
             </SessionProvider>
           </StoreProvider>
         </ThemeProvider>
