@@ -1,12 +1,13 @@
 'use client'
 import { Session } from 'next-auth'
 import React, { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import axios from 'axios';
 import { useParams } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Drafts from '@/components/userTabs/drafts';
 import Published from '@/components/userTabs/Published';
+import { ChangePassword } from '@/components/user-profile-features/changePassword';
 
 
 
@@ -52,7 +53,9 @@ const Page = () => {
             <div>role: {user.role}</div>
             <div>verified: {user.isVerified ? 'true' : 'false'}</div>
           </CardContent>
-
+          <CardFooter>
+            <ChangePassword/>
+          </CardFooter>
         </Card>
 
         {/* Tabs */}

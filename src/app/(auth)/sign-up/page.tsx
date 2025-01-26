@@ -24,7 +24,7 @@ const page = () => {
         }
     });
 
-    //TODO:
+ 
     const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
         console.log(values);
         try {
