@@ -92,7 +92,9 @@ const page = () => {
                     <Button type="submit" >Submit</Button>
                 </form>
             </Form>
-            Don't have an account? <Link href={'/sign-up'} className="underline">SignUp</Link>
+            <Link href={'/forgot-password'} className="underline">Forget Password</Link>
+            Don't have an account? 
+            <Link href={'/sign-up'} className="underline">SignUp</Link>
         </div>
     )
 }

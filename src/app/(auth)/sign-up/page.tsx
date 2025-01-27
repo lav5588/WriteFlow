@@ -106,6 +106,7 @@ const page = () => {
                     <Button type="submit" >Submit</Button>
                 </form>
             </Form>
+            <Link href={'/forgot-password'} className="underline">Forget Password</Link>
             Already have an account? <Link href={'/sign-in'} className="underline">SignIn</Link>
         </div>
     )
