@@ -1,2 +1,33 @@
-hello sir how are you
-it's just for checking the git push working
+Forgot Password
+
+        Frontend
+            /forgot-password
+                    email or username
+                    an email will be sent with link and jwt token
+                    /jwt token
+                        new password
+                        confirm password
+                        change
+
+
+        backend
+            /forgot-password
+                Get request
+                    user = search from username or email
+                    if(!user){
+                        send a message with 404 user not found
+                    }
+                    token = create jwt token with an expiry
+                    send an email with link /forgot-password/jwt token
+                    return response
+
+
+                POST request
+                    token = from the client
+                    user = search by token and expiry
+                    if(!user) {
+                        send a response with invalid url
+                    }
+                    user.password = newPassword
+                    user.save
+

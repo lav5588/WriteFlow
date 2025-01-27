@@ -27,6 +27,7 @@ export async function POST(request: Request) {
         if (isCodeValid && isCodeNotExpired) {
             // Update the user's verification status
             user.isVerified = true;
+            user.emailVerificationCode = '';
             await user.save();
 
             const response: ApiResponse = {
