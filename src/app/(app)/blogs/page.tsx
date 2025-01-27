@@ -1,6 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useToast } from "@/hooks/use-toast"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 
@@ -16,6 +17,8 @@ const truncateHTML = (html: string, maxLength: number) => {
 const Page = () => {
     const [data, setData] = useState([])
     const router = useRouter();
+    const { toast } = useToast();
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -24,6 +27,10 @@ const Page = () => {
                 setData(response.data.data);
             } catch (error) {
                 console.log("Error in fetching data: ", error);
+                toast({
+                    variant: "destructive",
+                    title: error?.message,
+                })
             }
         }
         fetchData()

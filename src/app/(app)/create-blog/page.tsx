@@ -4,6 +4,7 @@ import RichTextEditor from "@/components/RichtextEditor/richTextEditor"
 import { setId, setIsPublished } from "@/components/store/slices/blogSlice"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { useToast } from "@/hooks/use-toast"
 import { blogSchema } from "@/schemas/blogSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
@@ -22,7 +23,7 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
 
 
     const dispatch = useDispatch();
-    
+    const { toast } = useToast();
     const blogId = useSelector((state) => state.blogReducer.id);
     const isPublished = useSelector(state => state.blogReducer.isPublished);
     console.log("hello world!");
@@ -91,10 +92,18 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
             console.log("response: ", response);
             if (!response) {
                 console.log('Error updating blog data', response);
+                toast({
+                    variant: "destructive",
+                    title: "Error updating blog data",
+                });
                 return;
             }
+
+            toast({
+                title: "Blog updated successfully",
+            });
             return response;
-            console.log('isValid: ', isValid);
+            
         } catch (error) {
             console.log('Error', error);
             try {
@@ -112,6 +121,12 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
             }
 
             console.log('Error', error);
+
+            toast({
+                variant: "destructive",
+                title: "Error updating blog data",
+                description: error?.message,
+            });
         }
 
     };
@@ -132,12 +147,19 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
             console.log("response: ", response);
             if (!response) {
                 console.log('Error saving blog data', response);
+                toast({
+                    variant: "destructive",
+                    title: "Error saving blog data",
+                });
                 return;
             }
             console.log("response: ", response);
             id = response.data.data._id;
             dispatch(setId(id));
             console.log("id:",id);
+            toast({
+                title: "Blog saved successfully",
+            });
             return response;
         } catch (error) {
 
@@ -156,7 +178,15 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
             }
 
             console.log('Error', error);
+
+            toast({
+                variant: "destructive",
+                title: "Error saving blog data",
+                description: error?.message,
+            });
         }
+
+
 
     }
 
@@ -181,6 +211,10 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
             console.log("id: ", id)
             if (!response) {
                 console.log('Error publishing blog', response);
+                toast({
+                    variant: "destructive",
+                    title: "Error publishing blog",
+                });
                 return;
             }
             console.log(response)
@@ -190,9 +224,18 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
             console.log(`Blog ${response?.data.data.isPublished ? 'published' : 'unpublished'} successfully`, response);
             console.log("id: ", id)
 
+            toast({
+                title: `Blog ${response?.data.data.isPublished ? 'published' : 'unpublished'} successfully`,
+            });
+
         }
         catch (err) {
             console.log(err);
+            toast({
+                variant: "destructive",
+                title: "Error publishing blog",
+                description: err?.message,
+            });
         }
     }
 

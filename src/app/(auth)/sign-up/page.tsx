@@ -3,11 +3,13 @@
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { useToast } from "@/hooks/use-toast"
 import { signUpSchema } from "@/schemas/signUpSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { title } from "process"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -23,19 +25,28 @@ const page = () => {
             confirmPassword: '',
         }
     });
+    const {toast} = useToast();
 
- 
     const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
         console.log(values);
         try {
             const response = await axios.post('/api/sign-up', values)
-            if(!response){
+            if (!response) {
                 console.log('Error signing up user', response);
+                toast({
+                    title: 'Error signing up user',
+                    variant:'destructive'
+                })
             }
             router.push(`/verify/${values.username}`)
         }
         catch (error) {
             console.error(error);
+            toast({
+                title: 'Error signing up user',
+                description: error?.message,
+                variant:'destructive'
+            })
         }
     };
 

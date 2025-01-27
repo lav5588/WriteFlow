@@ -6,6 +6,7 @@ import {  signOut, useSession } from "next-auth/react";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { User } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 
 
@@ -13,13 +14,24 @@ import { User } from "lucide-react";
 export const Navbar = () => {
     
     const session = useSession()
+    const {toast} = useToast();
+
+
     const handleLogout = async () => {
         try {
             await signOut({
                 redirect:false
             });
+            toast({
+                title: "Logged out successfully",
+            });
         } catch (error) {
             console.log("error: " + error);
+            toast({
+                title: "Failed to logout",
+                variant: 'destructive',
+                description: error?.message,
+            });
         }
     }
     return (

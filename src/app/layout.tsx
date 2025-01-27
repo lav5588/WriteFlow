@@ -7,6 +7,7 @@ import StoreProvider from "@/components/store/storeProvider";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import WithAuth from "@/middlewareWraper";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -53,6 +54,7 @@ export default function RootLayout({
             </SessionProvider>
           </StoreProvider>
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );

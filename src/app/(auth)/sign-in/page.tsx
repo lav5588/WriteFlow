@@ -4,6 +4,7 @@ import { auth } from "@/auth"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { useToast } from "@/hooks/use-toast"
 import { signInSchema } from "@/schemas/signInSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { signIn } from 'next-auth/react';
@@ -24,6 +25,7 @@ const page = () => {
             password: '',
         }
     });
+    const {toast} = useToast();
 
 
     const onSubmit = async (values: z.infer<typeof signInSchema>) => {
@@ -33,14 +35,27 @@ const page = () => {
                 redirect:false,
             })
             console.log("SignIn response: ", response);
-            if(response.error){
+            if(response?.error){
+                toast({
+                    variant: "destructive",
+                    title: "Error signing in",
+                    description: response.error,
+                })
                 throw new Error(response.error);
             }
+            toast({
+                title: "Signed in successfully",
+            })
             router.push('/');
 
         }
         catch (error) {
             console.error("sign in error", error);
+            toast({
+                variant: "destructive",
+                title: "Error signing in",
+                description: error?.message,
+            })
         }
     };
 

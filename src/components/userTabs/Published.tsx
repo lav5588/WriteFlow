@@ -7,6 +7,9 @@ import { useEffect, useState } from "react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { EllipsisVertical, GalleryThumbnails, Pencil, Trash2, Undo2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog"
+import { useToast } from "@/hooks/use-toast"
+
+
 const truncateHTML = (html: string, maxLength: number) => {
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = html;
@@ -14,14 +17,12 @@ const truncateHTML = (html: string, maxLength: number) => {
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 
-const AlertBox = () => {
-    return
-}
+
 
 const Published = ({ username }) => {
     const [data, setData] = useState([])
     const router = useRouter();
-
+    const { toast } = useToast();
 
     const fetchData = async () => {
         try {
@@ -31,11 +32,16 @@ const Published = ({ username }) => {
             setData(response.data.post);
         } catch (error) {
             console.log("Error in fetching data: ", error);
+            toast({
+                title: "Failed to fetch published blogs",
+                variant: 'destructive',
+                description: error?.message,
+            });
         }
     }
-    
+
     useEffect(() => {
-       
+
         if (username) {
             fetchData()
         }
@@ -45,15 +51,27 @@ const Published = ({ username }) => {
 
     const handleDelete = async (slug) => {
         try {
-            const response = await axios.delete(`/api/delete-blog/${slug}`); 
-            if(!response){
+            const response = await axios.delete(`/api/delete-blog/${slug}`);
+            if (!response) {
                 console.log("Error in deleting blog");
+                toast({
+                    title: "Failed to delete blog",
+                    variant: 'destructive',
+                });
             }
-            console.log("response: " , response)
+            console.log("response: ", response)
+            toast({
+                title: "Blog deleted successfully",
+            });
             fetchData();
         }
         catch (error) {
             console.log("Error in deleting data: ", error);
+            toast({
+                title: "Failed to delete blog",
+                variant: 'destructive',
+                description: error?.message,
+            });
         }
     }
 
@@ -73,26 +91,41 @@ const Published = ({ username }) => {
     const handleUnpublish = async (id) => {
         try {
             // console.log("hello");
-            if(!id){
+            if (!id) {
                 console.log("id is required");
+                toast({
+                    title: "Id is required",
+                    variant: 'destructive',
+                });
                 throw new Error("Id is required");
             }
-            
-            const response = await axios.get('/api/publish', {  params: { id } });
+
+            const response = await axios.get('/api/publish', { params: { id } });
             if (!response) {
-                console.log('Error publishing blog', response);
+                console.log('Error unpublishing blog', response);
+                toast({
+                    title: "Failed to unpublish blog",
+                    variant: 'destructive',
+                });
                 return;
             }
+            toast({
+                title: "Blog Unpublished successfully",
+            });
             console.log('Blog Unpublished successfully', response);
             fetchData();
         }
         catch (err) {
             console.log(err);
+            toast({
+                title: "Failed to unpublish blog",
+                variant: 'destructive',
+                description: err?.message,
+            });
         }
     }
 
-   
- 
+
 
     return (
         <div className="mt-5">
@@ -108,11 +141,11 @@ const Published = ({ username }) => {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
                                     <DropdownMenuItem onClick={() => { handleClick(blog.slug) }}><GalleryThumbnails />View</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={()=>handleEdit(blog.slug)}><Pencil />Edit</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={()=> handleUnpublish(blog._id)}><Undo2 />Unpublish</DropdownMenuItem>
-                                    <DropdownMenuItem className="text-red-400" onClick={(e)=>e.preventDefault()}>
+                                    <DropdownMenuItem onClick={() => handleEdit(blog.slug)}><Pencil />Edit</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleUnpublish(blog._id)}><Undo2 />Unpublish</DropdownMenuItem>
+                                    <DropdownMenuItem className="text-red-400" onClick={(e) => e.preventDefault()}>
                                         <AlertDialog>
-                                            <AlertDialogTrigger className="flex justify-center items-end" ><Trash2 className="w-4"/>&nbsp;Delete</AlertDialogTrigger>
+                                            <AlertDialogTrigger className="flex justify-center items-end" ><Trash2 className="w-4" />&nbsp;Delete</AlertDialogTrigger>
                                             <AlertDialogContent>
                                                 <AlertDialogHeader>
                                                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -123,7 +156,7 @@ const Published = ({ username }) => {
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={()=>handleDelete(blog.slug)}>Continue</AlertDialogAction>
+                                                    <AlertDialogAction onClick={() => handleDelete(blog.slug)}>Continue</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>

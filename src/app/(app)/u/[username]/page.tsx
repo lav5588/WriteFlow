@@ -1,5 +1,5 @@
 'use client'
-import { Session } from 'next-auth'
+
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import axios from 'axios';
@@ -8,20 +8,41 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Drafts from '@/components/userTabs/drafts';
 import Published from '@/components/userTabs/Published';
 import { ChangePassword } from '@/components/user-profile-features/changePassword';
+import { useToast } from '@/hooks/use-toast';
+import { useSession } from 'next-auth/react';
 
 
 
 const Page = () => {
   // Define the state type
   const [user, setUser] = useState(null);
-
+  const { toast } = useToast();
   const params = useParams();
-
+  const session = useSession();
+  
   useEffect(() => {
     const fetchSession = async () => {
-      const response = await axios.get(`/api/u/${params.username}`);
-      console.log(response);
-      setUser(response.data);
+      try {
+        const response = await axios.get(`/api/u/${params.username}`);
+        if(!response) {
+          console.log("No user found with this username");
+          toast({
+            variant: "destructive",
+            title: "No user found with this username",
+          })
+          return;
+        }
+        console.log(response);
+        setUser(response.data);
+      } catch (error) {
+        console.log("Error in fetching user data: ", error);
+        toast({
+          variant: "destructive",
+          title: "Error fetching user data",
+          description: error?.message,
+        })
+        
+      }
     };
     fetchSession();
   }, []);
@@ -54,7 +75,7 @@ const Page = () => {
             <div>verified: {user.isVerified ? 'true' : 'false'}</div>
           </CardContent>
           <CardFooter>
-            <ChangePassword/>
+            {session?.data?.user?.username == user?.username && <ChangePassword/>}
           </CardFooter>
         </Card>
 
@@ -65,12 +86,12 @@ const Page = () => {
             <Tabs defaultValue="published" className="">
               <TabsList>
                 <TabsTrigger value="published">Published</TabsTrigger>
-                <TabsTrigger value="draft">Drafts</TabsTrigger>
+                {session?.data?.user?.username == user?.username && <TabsTrigger value="draft">Drafts</TabsTrigger>}
               </TabsList>
               <TabsContent value="draft">
                 <Drafts />
               </TabsContent>
-              <TabsContent value="published">Change your published content here.
+              <TabsContent value="published">
                 <Published username={params.username}/>
               </TabsContent>
             </Tabs>

@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/popover"
 
 import { useSelector} from 'react-redux'
+import { useToast } from '@/hooks/use-toast'
 
 
 const MenuBar = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
@@ -29,7 +30,7 @@ const MenuBar = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
     const [savingContent, setSavingContent] = useState(false)
     const [publishingContent, setPublishingContent] = useState(false)
     const [updatingContent, setUpdatingContent] = useState(false)
-   
+    const {toast} = useToast()
     const isPublished = useSelector(state => state.blogReducer.isPublished);
 
     if (!editor) {
@@ -47,6 +48,9 @@ const MenuBar = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
         console.log("getText(): ", editor.getText())
         if (editor.getText().trim() === '') {
             console.log("Content is empty")
+            toast({
+                title: "Content is empty",
+            })
             return
         }
         console.log("getHTML(): ", editor.getHTML())
@@ -62,6 +66,9 @@ const MenuBar = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
         console.log("getText(): ", editor.getText())
         if (editor.getText().trim() === '') {
             console.log("Content is empty")
+            toast({
+                title: "Content is empty",
+            })
             return
         }
         console.log("getHTML(): ", editor.getHTML())
@@ -78,6 +85,9 @@ const MenuBar = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
         console.log("getText(): ", editor.getText())
         if (editor.getText().trim() === '') {
             console.log("Content is empty")
+            toast({
+                title: "Content is empty",
+            })
             return
         }
         console.log("getHTML(): ", editor.getHTML())

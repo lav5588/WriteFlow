@@ -5,12 +5,14 @@ import axios from "axios";
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react";
 import '@/components/RichtextEditor/styles.scss';
+import { useToast } from "@/hooks/use-toast";
 
 
 
 const Page = () => {
     const params = useParams();
     const [blog, setBlog] = useState(null);
+    const {toast} = useToast();
 
     useEffect(() => {
         const fetchBlog = async () => {
@@ -20,6 +22,10 @@ const Page = () => {
                 setBlog(data)
                 console.log("blog: ", response);
             } catch (error) {
+                toast({
+                    variant: "destructive",
+                    title: error?.message,
+                })
                 console.log("error in fetching blog: ", error);
             }
         }

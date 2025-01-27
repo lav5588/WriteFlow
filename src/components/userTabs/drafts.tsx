@@ -8,6 +8,7 @@ import { useEffect, useState } from "react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { EllipsisVertical, GalleryThumbnails, Pencil, Rss, Trash2, Undo2 } from "lucide-react"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog"
+import { useToast } from "@/hooks/use-toast"
 
 const truncateHTML = (html: string, maxLength: number) => {
     const tempDiv = document.createElement("div");
@@ -19,6 +20,7 @@ const truncateHTML = (html: string, maxLength: number) => {
 const Drafts = () => {
     const [data, setData] = useState([])
     const router = useRouter();
+    const {toast} = useToast();
 
     const fetchData = async () => {
         try {
@@ -26,6 +28,11 @@ const Drafts = () => {
             console.log("Data fetched: ", response);
             setData(response.data);
         } catch (error) {
+            toast({
+                title: "Failed to fetch drafts",
+                variant: 'destructive',
+                description:error?.message,
+            });
             console.log("Error in fetching data: ", error);
         }
     }
@@ -48,11 +55,23 @@ const Drafts = () => {
             const response = await axios.delete(`/api/delete-blog/${slug}`); 
             if(!response){
                 console.log("Error in deleting blog");
+                toast({
+                    title: "Failed to delete blog",
+                    variant: 'destructive',
+                });
             }
             console.log("response: " , response)
+            toast({
+                title: "Blog deleted successfully",
+            });
             fetchData();
         }
         catch (error) {
+            toast({
+                title: "Failed to delete blog",
+                variant: 'destructive',
+                description:error?.message,
+            });
             console.log("Error in deleting data: ", error);
         }
     }
@@ -64,18 +83,34 @@ const Drafts = () => {
             // console.log("hello");
             if(!id){
                 console.log("id is required");
+                toast({
+                    title: "Id is required",
+                    variant: 'destructive',
+                });
                 throw new Error("Id is required");
             }
             
             const response = await axios.get('/api/publish', {  params: { id } });
             if (!response) {
                 console.log('Error publishing blog', response);
+                toast({
+                    title: "Failed to publish blog",
+                    variant: 'destructive',
+                });
                 return;
             }
             console.log('Blog Published successfully', response);
+            toast({
+                title: "Blog Published successfully",
+            });
             fetchData();
         }
         catch (err) {
+            toast({
+                title: "Failed to publish blog",
+                variant: 'destructive',
+                description:err?.message,
+            });
             console.log(err);
         }
     }

@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
+import { useToast } from "@/hooks/use-toast"
 import { veryfyCodeSchema } from "@/schemas/verifyCodeSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
@@ -15,7 +16,7 @@ const page = () => {
 
     const params = useParams();
     const router = useRouter()
-
+    const { toast } = useToast();
     const form = useForm<z.infer<typeof veryfyCodeSchema>>({
         resolver: zodResolver(veryfyCodeSchema),
         defaultValues: {
@@ -23,9 +24,7 @@ const page = () => {
         }
     });
 
-    //TODO:
     const onSubmit = async(values: z.infer<typeof veryfyCodeSchema>) => {
-        // TODO: do the network call
         const data = {username:params.username,code:values.verifyCode}
         console.log(data);
         try {
@@ -34,6 +33,11 @@ const page = () => {
             router.push('/sign-in')
         } catch (error) {
             console.log("user verification error",error);
+            toast({
+                title: 'User verification failed',
+                description: error?.message,
+                variant:'destructive'
+            })
         }
     };
 

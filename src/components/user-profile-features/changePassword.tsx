@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 const passWordSchema = z.object({
     oldPassword: z.string(),
@@ -25,7 +26,7 @@ const passWordSchema = z.object({
 
 export function ChangePassword() {
     const [isOpen, setIsOpen] = useState(false);
-
+    const {toast} = useToast();
     const form = useForm<z.infer<typeof passWordSchema>>({
         resolver: zodResolver(passWordSchema),
         defaultValues: {
@@ -48,11 +49,18 @@ export function ChangePassword() {
             const response = await axios.post("/api/change-password", values);
             console.log("change password response: ", response);
             if(response.status === 200) {
-                alert("Password changed successfully");
+                toast({
+                    title: "Password changed successfully",
+                });
             }
             
         } catch (error) {
             console.log("change password error: ", error);
+            toast({
+                title: "Failed to change password",
+                variant: 'destructive',
+                description:error?.message,
+            });
         }
         finally{
             form.reset(); 
