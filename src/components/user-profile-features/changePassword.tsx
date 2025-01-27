@@ -17,6 +17,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+import { PencilLine } from "lucide-react";
 
 const passWordSchema = z.object({
     oldPassword: z.string(),
@@ -72,7 +73,7 @@ export function ChangePassword() {
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" onClick={() => setIsOpen(true)}>Change Password</Button>
+                <Button variant="outline" onClick={() => setIsOpen(true)}><PencilLine/>Change Password</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
