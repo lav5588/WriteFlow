@@ -10,7 +10,13 @@ import Published from '@/components/userTabs/Published';
 import { ChangePassword } from '@/components/user-profile-features/changePassword';
 import { useToast } from '@/hooks/use-toast';
 import { useSession } from 'next-auth/react';
-
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+import { CameraIcon, PencilIcon } from 'lucide-react';
+import { UpdateProfile } from '@/components/user-profile-features/update-profile';
 
 
 const Page = () => {
@@ -19,31 +25,33 @@ const Page = () => {
   const { toast } = useToast();
   const params = useParams();
   const session = useSession();
-  
-  useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const response = await axios.get(`/api/u/${params.username}`);
-        if(!response) {
-          console.log("No user found with this username");
-          toast({
-            variant: "destructive",
-            title: "No user found with this username",
-          })
-          return;
-        }
-        console.log(response);
-        setUser(response.data);
-      } catch (error) {
-        console.log("Error in fetching user data: ", error);
+
+  const fetchSession = async () => {
+    try {
+      const response = await axios.get(`/api/u/${params.username}`);
+      if (!response) {
+        console.log("No user found with this username");
         toast({
           variant: "destructive",
-          title: "Error fetching user data",
-          description: error?.message,
+          title: "No user found with this username",
         })
-        
+        return;
       }
-    };
+      console.log(response);
+      setUser(response.data);
+    } catch (error) {
+      console.log("Error in fetching user data: ", error);
+      toast({
+        variant: "destructive",
+        title: "Error fetching user data",
+        description: error?.message,
+      })
+
+    }
+  };
+
+  useEffect(() => {
+    
     fetchSession();
   }, []);
 
@@ -59,14 +67,20 @@ const Page = () => {
   }
 
 
-
   return (
     <>
 
       <div className='flex justify-center items-center flex-col'>
         <Card className='mb-5'>
-          <CardHeader>
+          <CardHeader className='flex jutify-center items-center'>
             <CardTitle>User Profile</CardTitle>
+            <div className="relative h-[5rem] w-[5rem] ml-5">
+              <Avatar className="h-full w-full">
+                <AvatarImage
+                  src={user.profileImage} alt={user.username}/>
+                <AvatarFallback >{user.username[0].toLocaleUpperCase()}</AvatarFallback>
+              </Avatar>
+            </div>
           </CardHeader>
           <CardContent>
             <div>username: {user.username}</div>
@@ -75,7 +89,7 @@ const Page = () => {
             <div>verified: {user.isVerified ? 'true' : 'false'}</div>
           </CardContent>
           <CardFooter>
-            {session?.data?.user?.username == user?.username && <ChangePassword/>}
+            {session?.data?.user?.username == user?.username && <UpdateProfile user={user} fetchSession={fetchSession}/>}
           </CardFooter>
         </Card>
 
@@ -92,7 +106,7 @@ const Page = () => {
                 <Drafts />
               </TabsContent>
               <TabsContent value="published">
-                <Published username={params.username}/>
+                <Published username={params.username} />
               </TabsContent>
             </Tabs>
           </div>

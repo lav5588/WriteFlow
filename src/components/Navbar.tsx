@@ -7,6 +7,7 @@ import {  signOut, useSession } from "next-auth/react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ChangePassword } from "./user-profile-features/changePassword";
 
 
 
@@ -65,6 +66,11 @@ export const Navbar = () => {
                             <DropdownMenuItem>
                                 <Link href={`/u/${session?.data?.user.username}`} >
                                     Profile
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <Link href={`/change-password`} >
+                                    Change Password
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>

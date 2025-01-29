@@ -31,3 +31,17 @@ Forgot Password
                     user.password = newPassword
                     user.save
 
+
+
+add profile picture
+    frontend
+        show in user
+        upload from update profile
+
+    backend
+        upload on cloudinary
+        save link in user
+        then delete previous existed profile pic from cloudinary
+        then send response
+
+    
