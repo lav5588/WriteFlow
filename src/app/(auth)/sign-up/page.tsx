@@ -7,9 +7,11 @@ import { useToast } from "@/hooks/use-toast"
 import { signUpSchema } from "@/schemas/signUpSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
+import { Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { title } from "process"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -25,7 +27,8 @@ const page = () => {
             confirmPassword: '',
         }
     });
-    const {toast} = useToast();
+    const { toast } = useToast();
+    const [viewPassword,setViewPassword] = useState(false);
 
     const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
         console.log(values);
@@ -35,7 +38,7 @@ const page = () => {
                 console.log('Error signing up user', response);
                 toast({
                     title: 'Error signing up user',
-                    variant:'destructive'
+                    variant: 'destructive'
                 })
             }
             router.push(`/verify/${values.username}`)
@@ -45,7 +48,7 @@ const page = () => {
             toast({
                 title: 'Error signing up user',
                 description: error?.message,
-                variant:'destructive'
+                variant: 'destructive'
             })
         }
     };
@@ -85,7 +88,11 @@ const page = () => {
                         render={({ field }) => (
                             <FormItem>
                                 <FormControl>
-                                    <Input placeholder="password" {...field} type="password" />
+                                    <div className="relative">
+                                        <Input placeholder="password" {...field} type={viewPassword?'text':'password'} className="pr-10"/>
+                                        {!viewPassword &&<Eye className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={()=>setViewPassword(!viewPassword)}/>}
+                                        {viewPassword && <EyeOff className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={()=>setViewPassword(!viewPassword)}/>}
+                                    </div>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

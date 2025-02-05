@@ -10,7 +10,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
-import { PencilLine } from "lucide-react";
+import { Eye, EyeOff, PencilLine } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 
@@ -23,6 +23,8 @@ const passWordSchema = z.object({
 export default function ChangePassword() {
     const router = useRouter();
     const { toast } = useToast();
+    const [viewPasswordOld,setViewPasswordOld] = useState(false);
+    const [viewPasswordNew,setViewPasswordNew] = useState(false);
     const form = useForm<z.infer<typeof passWordSchema>>({
         resolver: zodResolver(passWordSchema),
         defaultValues: {
@@ -81,7 +83,11 @@ export default function ChangePassword() {
                                     <FormItem>
                                         <FormLabel>Old Password</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Enter your old password" {...field} type="password" />
+                                            <div className="relative">
+                                                <Input placeholder="Enter your old password" {...field} type={viewPasswordOld?'text':'password'} className="pr-10"/>
+                                                {!viewPasswordOld && <Eye className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={() => setViewPasswordOld(!viewPasswordOld)} />}
+                                                {viewPasswordOld && <EyeOff className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={() => setViewPasswordOld(!viewPasswordOld)} />}
+                                            </div>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -94,7 +100,11 @@ export default function ChangePassword() {
                                     <FormItem>
                                         <FormLabel>New Password</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Enter your new password" {...field} type="password" />
+                                            <div className="relative">
+                                                <Input placeholder="Enter your new password" {...field} type={viewPasswordNew?'text':'password'} className="pr-10" />
+                                                {!viewPasswordNew && <Eye className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={() => setViewPasswordNew(!viewPasswordNew)} />}
+                                                {viewPasswordNew && <EyeOff className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={() => setViewPasswordNew(!viewPasswordNew)} />}
+                                            </div>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

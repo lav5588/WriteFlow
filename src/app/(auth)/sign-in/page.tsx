@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 import { signInSchema } from "@/schemas/signInSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Eye, EyeOff } from "lucide-react"
 import { signIn } from 'next-auth/react';
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 
 import { useForm } from "react-hook-form"
@@ -25,17 +27,18 @@ const page = () => {
             password: '',
         }
     });
-    const {toast} = useToast();
+    const { toast } = useToast();
+    const [viewPassword, setViewPassword] = useState(false);
 
 
     const onSubmit = async (values: z.infer<typeof signInSchema>) => {
         try {
             const response = await signIn("credentials", {
                 ...values,
-                redirect:false,
+                redirect: false,
             })
             console.log("SignIn response: ", response);
-            if(response?.error){
+            if (response?.error) {
                 toast({
                     variant: "destructive",
                     title: "Error signing in",
@@ -82,7 +85,11 @@ const page = () => {
                         render={({ field }) => (
                             <FormItem>
                                 <FormControl>
-                                    <Input placeholder="password" {...field} type="password" />
+                                    <div className="relative">
+                                        <Input placeholder="password" {...field} type="password" type={viewPassword?'text':'password'} className="pr-10"/>
+                                        {!viewPassword && <Eye className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={()=>setViewPassword(!viewPassword)}/>}
+                                        {viewPassword && <EyeOff className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={()=>setViewPassword(!viewPassword)}/>}
+                                    </div>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -93,7 +100,7 @@ const page = () => {
                 </form>
             </Form>
             <Link href={'/forgot-password'} className="underline">Forget Password</Link>
-            Don't have an account? 
+            Don't have an account?
             <Link href={'/sign-up'} className="underline">SignUp</Link>
         </div>
     )
