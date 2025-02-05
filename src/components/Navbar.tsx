@@ -2,26 +2,26 @@
 import Link from "next/link";
 import { ModeToggle } from "./mode-toggle";
 
-import {  signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { ChangePassword } from "./user-profile-features/changePassword";
+import { useState } from "react";
 
 
 
 
 export const Navbar = () => {
-    
-    const session = useSession()
-    const {toast} = useToast();
 
+    const session = useSession()
+    const { toast } = useToast();
+    // const [isopen,setIsOpen] = useState('');
 
     const handleLogout = async () => {
         try {
             await signOut({
-                redirect:false
+                redirect: false
             });
             toast({
                 title: "Logged out successfully",
@@ -56,19 +56,19 @@ export const Navbar = () => {
                 </Link>}
 
                 {
-                    session?.data?.user && <DropdownMenu>
+                    session?.data?.user && <DropdownMenu >
                         <DropdownMenuTrigger>
-                            <User />
+                            <User/>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             <DropdownMenuLabel>{session?.data?.user.username}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>
+                            <DropdownMenuItem asChild>
                                 <Link href={`/u/${session?.data?.user.username}`} >
                                     Profile
                                 </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem asChild>
                                 <Link href={`/change-password`} >
                                     Change Password
                                 </Link>
