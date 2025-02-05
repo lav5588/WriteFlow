@@ -15,6 +15,7 @@ declare module 'next-auth' {
     role:'ADMIN' | 'USER';
     isVerified?: boolean;
     username?: string;
+    profileImage?: string;
   }
 }
 

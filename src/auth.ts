@@ -59,6 +59,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 token.role = user.role;
                 token.isVerified = user.isVerified;
                 token.username = user.username;
+                token.profileImage = user.profileImage;
             }
             return token;
         },
@@ -68,6 +69,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 session.user.role = token.role;
                 session.user.isVerified = token.isVerified;
                 session.user.username = token.username;
+                session.user.profileImage = token.profileImage;
             }
             return session;
         },

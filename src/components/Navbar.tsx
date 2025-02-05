@@ -1,13 +1,10 @@
 'use client'
 import Link from "next/link";
 import { ModeToggle } from "./mode-toggle";
-
 import { signOut, useSession } from "next-auth/react";
-
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 
 
@@ -16,7 +13,8 @@ export const Navbar = () => {
 
     const session = useSession()
     const { toast } = useToast();
-    // const [isopen,setIsOpen] = useState('');
+    
+    console.log("session", session)
 
     const handleLogout = async () => {
         try {
@@ -58,7 +56,11 @@ export const Navbar = () => {
                 {
                     session?.data?.user && <DropdownMenu >
                         <DropdownMenuTrigger>
-                            <User/>
+                            <Avatar className="h-10 w-10">
+                                <AvatarImage
+                                    src={session?.data?.user?.profileImage} alt={session?.data?.user.username} />
+                                <AvatarFallback >{session?.data?.user.username[0].toLocaleUpperCase()}</AvatarFallback>
+                            </Avatar>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             <DropdownMenuLabel>{session?.data?.user.username}</DropdownMenuLabel>
