@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import axios from "axios"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 import { useEffect, useState } from "react"
@@ -49,12 +50,12 @@ const Page = () => {
             <h1 className="text-center font-extrabold text-3xl mb-5">Blogs</h1>
             <div className="flex flex-wrap gap-2 md:gap-5  justify-center items-center">
                 {data.map((blog) => (
-                    <Card key={blog._id} className="h-[20rem]  w-[20rem]" onClick={() => { handleClick(blog.slug) }}>
+                    <Card key={blog._id} className="h-[20rem]  w-[20rem]" >
                         <CardHeader>
-                            <CardTitle className="leading-6" ><h5>{blog.title.toUpperCase()}</h5></CardTitle>
-                            <p className="text-right">~{blog.author.username}</p>
+                            <CardTitle onClick={() => { handleClick(blog.slug) }} className="leading-6 cursor-pointer" ><h5>{blog.title.toUpperCase()}</h5></CardTitle>
+                            <p className="text-right"><Link href={`/u/${blog.author.username}`}>~{blog.author.username}</Link></p>
                         </CardHeader>
-                        <CardContent >
+                        <CardContent onClick={() => { handleClick(blog.slug) }} className="cursor-pointer">
                             <div
                                 dangerouslySetInnerHTML={{ __html: truncateHTML(blog.content,200) }}
                             />

@@ -38,7 +38,7 @@ const Page = () => {
         <div className="flex justify-center">
             <Card className="md:w-[60vw] w-[98vw]  leading-7 min-w-[20rem] p-5">
                 {blog && <h1 className="text-3xl text-center text-cyan-500 mb-5">{blog.title.toUpperCase()}</h1>}
-                {blog && <p className="text-right"><Link href={`/u/${blog.author.username}`}></Link>~{blog.author.username}</p>}
+                {blog && <p className="text-right"><Link href={`/u/${blog.author.username}`} className="cursor-pointer">~{blog.author.username}</Link></p>}
                 {blog && (
                     <div
                     className="whitespace-pre-wrap break-words content"

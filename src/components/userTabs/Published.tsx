@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { EllipsisVertical, GalleryThumbnails, Pencil, Trash2, Undo2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog"
 import { useToast } from "@/hooks/use-toast"
+import { useSession } from "next-auth/react"
 
 
 const truncateHTML = (html: string, maxLength: number) => {
@@ -23,6 +24,7 @@ const Published = ({ username }) => {
     const [data, setData] = useState([])
     const router = useRouter();
     const { toast } = useToast();
+    const session = useSession();
 
     const fetchData = async () => {
         try {
@@ -135,7 +137,7 @@ const Published = ({ username }) => {
                     <Card key={blog._id} className="h-[20rem]  w-[20rem]">
                         <CardHeader className="flex flex-row justify-between place-items-start">
                             <CardTitle className="leading-6" onClick={() => { handleClick(blog.slug) }}><h5>{blog.title.toUpperCase()}</h5></CardTitle>
-                            <DropdownMenu>
+                            {session?.data?.user?.username == username && <DropdownMenu>
                                 <DropdownMenuTrigger className="w-4 0">
                                     <EllipsisVertical />
                                 </DropdownMenuTrigger>
@@ -163,7 +165,7 @@ const Published = ({ username }) => {
                                     </DropdownMenuItem>
 
                                 </DropdownMenuContent>
-                            </DropdownMenu>
+                            </DropdownMenu>}
                         </CardHeader>
                         <CardContent onClick={() => { handleClick(blog.slug) }}>
                             <div
