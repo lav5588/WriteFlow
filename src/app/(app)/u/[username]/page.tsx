@@ -7,7 +7,6 @@ import { useParams } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Drafts from '@/components/userTabs/drafts';
 import Published from '@/components/userTabs/Published';
-import { ChangePassword } from '@/components/user-profile-features/changePassword';
 import { useToast } from '@/hooks/use-toast';
 import { useSession } from 'next-auth/react';
 import {
@@ -15,8 +14,9 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar"
-import { CameraIcon, PencilIcon } from 'lucide-react';
 import { UpdateProfile } from '@/components/user-profile-features/update-profile';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+
 
 
 const Page = () => {
@@ -51,7 +51,7 @@ const Page = () => {
   };
 
   useEffect(() => {
-    
+
     fetchSession();
   }, []);
 
@@ -75,11 +75,23 @@ const Page = () => {
           <CardHeader className='flex jutify-center items-center'>
             <CardTitle>User Profile</CardTitle>
             <div className="relative h-[5rem] w-[5rem] ml-5">
-              <Avatar className="h-full w-full">
+              {user?.profileImage === "" && <Avatar className="h-full w-full">
                 <AvatarImage
-                  src={user.profileImage} alt={user.username}/>
+                  src={user.profileImage} alt={user.username} />
                 <AvatarFallback >{user.username[0].toLocaleUpperCase()}</AvatarFallback>
-              </Avatar>
+              </Avatar>}
+              {user?.profileImage !== "" && <Dialog>
+                <DialogTrigger>
+                  <Avatar className="h-full w-full">
+                    <AvatarImage
+                      src={user.profileImage} alt={user.username} />
+                    <AvatarFallback >{user.username[0].toLocaleUpperCase()}</AvatarFallback>
+                  </Avatar>
+                </DialogTrigger>
+                <DialogContent>
+                  <img src={user.profileImage} alt="userImage" className='pt-2'/>
+                </DialogContent>
+              </Dialog>}
             </div>
           </CardHeader>
           <CardContent>
@@ -89,7 +101,7 @@ const Page = () => {
             <div>verified: {user.isVerified ? 'true' : 'false'}</div>
           </CardContent>
           <CardFooter>
-            {session?.data?.user?.username == user?.username && <UpdateProfile user={user} fetchSession={fetchSession}/>}
+            {session?.data?.user?.username == user?.username && <UpdateProfile user={user} fetchSession={fetchSession} />}
           </CardFooter>
         </Card>
 
