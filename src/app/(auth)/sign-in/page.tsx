@@ -86,9 +86,9 @@ const page = () => {
                             <FormItem>
                                 <FormControl>
                                     <div className="relative">
-                                        <Input placeholder="password" {...field} type="password" type={viewPassword?'text':'password'} className="pr-10"/>
-                                        {!viewPassword && <Eye className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={()=>setViewPassword(!viewPassword)}/>}
-                                        {viewPassword && <EyeOff className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={()=>setViewPassword(!viewPassword)}/>}
+                                        <Input placeholder="password" {...field} type="password" type={viewPassword ? 'text' : 'password'} className="pr-10" />
+                                        {!viewPassword && <Eye className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={() => setViewPassword(!viewPassword)} />}
+                                        {viewPassword && <EyeOff className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={() => setViewPassword(!viewPassword)} />}
                                     </div>
                                 </FormControl>
                                 <FormMessage />

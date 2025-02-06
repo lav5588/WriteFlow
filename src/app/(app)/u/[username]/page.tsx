@@ -17,8 +17,6 @@ import {
 import { UpdateProfile } from '@/components/user-profile-features/update-profile';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
-
-
 const Page = () => {
   // Define the state type
   const [user, setUser] = useState(null);
@@ -89,7 +87,7 @@ const Page = () => {
                   </Avatar>
                 </DialogTrigger>
                 <DialogContent>
-                  <img src={user.profileImage} alt="userImage" className='pt-2'/>
+                  <img src={user.profileImage} alt="userImage" className='pt-2' />
                 </DialogContent>
               </Dialog>}
             </div>
