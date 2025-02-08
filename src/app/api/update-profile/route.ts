@@ -29,11 +29,12 @@ export async function PUT(request: Request): Promise<Response> {
             if (oldProfileImageUrl) {
                 await deleteFromCloudinary(oldProfileImageUrl);
             }
+            session.user.profileImage = profileImageUrl;
         }
     
         await user.save();
     
-        console.log("session: ", session);
+        // console.log("session: ", session);
     
         return Response.json({ session, user }, { status: 200 });
     } catch (error) {

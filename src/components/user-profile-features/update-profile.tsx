@@ -23,6 +23,8 @@ import {
     AvatarFallback,
     AvatarImage,
 } from "@/components/ui/avatar"
+import { signIn, useSession } from "next-auth/react";
+
 
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 const profileSchema = z.object({
@@ -37,6 +39,7 @@ export function UpdateProfile({ user, fetchSession }) {
     const [profileImageLink, setProfileImageLink] = useState(user.profileImage);
     const [prImage, setPrImage] = useState("");
     const inputRef = useRef();
+    const session = useSession();
 
     const form = useForm<z.infer<typeof profileSchema>>({
         resolver: zodResolver(profileSchema),
@@ -58,7 +61,8 @@ export function UpdateProfile({ user, fetchSession }) {
             const formData = new FormData();
             formData.append("profileImage", values.profileImage);
             const response = await axios.put("/api/update-profile", formData);
-            console.log("response: ", response);
+            console.log("response: ", response.data);
+            await signIn("credentials",{identifier:"", password:""});
             await fetchSession();
         }
         catch (error) {

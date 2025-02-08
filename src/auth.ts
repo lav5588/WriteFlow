@@ -18,6 +18,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
             async authorize(credentials: any): Promise<any> {
                 await dbConnect();
+                const session = await auth();
+                if(session?.user) {
+                    const user =await UserModel.findOne({ username:session?.user.username });
+                    if (user) {
+                        return user;
+                    }
+                }
                 try {
                     const user = await UserModel.findOne({
                         $or: [
@@ -25,19 +32,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                             { username: credentials.identifier },
                         ],
                     });
-                    console.log("user: ",user);
+                    console.log("user: ", user);
                     if (!user) {
                         throw new Error('No user found with this email');
                     }
                     if (!user.isVerified) {
                         throw new Error('Please verify your account before logging in');
                     }
-                    console.log("credentials: ",credentials);
+                    console.log("credentials: ", credentials);
                     const isPasswordCorrect = await bcrypt.compare(
                         credentials.password,
                         user.password
                     );
-                    console.log("isPasswordCorrect: ",isPasswordCorrect);
+                    console.log("isPasswordCorrect: ", isPasswordCorrect);
                     if (isPasswordCorrect) {
                         return user;
                     } else {
