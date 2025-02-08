@@ -62,7 +62,7 @@ export function UpdateProfile({ user, fetchSession }) {
             formData.append("profileImage", values.profileImage);
             const response = await axios.put("/api/update-profile", formData);
             console.log("response: ", response.data);
-            await signIn("credentials",{identifier:"", password:""});
+            await signIn("credentials",{identifier:"", password:"",redirect: false});
             await fetchSession();
         }
         catch (error) {
