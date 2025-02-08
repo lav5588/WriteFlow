@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { EllipsisVertical, GalleryThumbnails, Pencil, Rss, Trash2, Undo2 } from "lucide-react"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog"
 import { useToast } from "@/hooks/use-toast"
+import { deleteDraft, publishDraft } from "@/network-call/userProfile.networkCall"
 
 const truncateHTML = (html: string, maxLength: number) => {
     const tempDiv = document.createElement("div");
@@ -17,32 +18,11 @@ const truncateHTML = (html: string, maxLength: number) => {
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 
-const Drafts = () => {
-    const [data, setData] = useState([])
+const Drafts = ({ draftData, fetchPublishedAndUnpublishedData }) => {
     const router = useRouter();
-    const {toast} = useToast();
+    
 
-    const fetchData = async () => {
-        try {
-            const response = await axios.get('/api/drafts');
-            console.log("Data fetched: ", response);
-            setData(response.data);
-        } catch (error) {
-            toast({
-                title: "Failed to fetch drafts",
-                variant: 'destructive',
-                description:error?.message,
-            });
-            console.log("Error in fetching data: ", error);
-        }
-    }
-
-    useEffect(() => {
-        
-        fetchData()
-    }, [])
-
-    if (data.length == 0) {
+    if (draftData.length == 0) {
         return <div>There is no drafts</div>
     }
 
@@ -51,77 +31,28 @@ const Drafts = () => {
     };
 
     const handleDelete = async (slug) => {
-        try {
-            const response = await axios.delete(`/api/delete-blog/${slug}`); 
-            if(!response){
-                console.log("Error in deleting blog");
-                toast({
-                    title: "Failed to delete blog",
-                    variant: 'destructive',
-                });
-            }
-            console.log("response: " , response)
-            toast({
-                title: "Blog deleted successfully",
-            });
-            fetchData();
-        }
-        catch (error) {
-            toast({
-                title: "Failed to delete blog",
-                variant: 'destructive',
-                description:error?.message,
-            });
-            console.log("Error in deleting data: ", error);
-        }
+        await deleteDraft(slug);
+        fetchPublishedAndUnpublishedData();
     }
+
     const handleEdit = (slug) => {
         router.push(`/draft/${slug}`)
     };
+
     const handlePublish = async (id) => {
-        try {
-            // console.log("hello");
-            if(!id){
-                console.log("id is required");
-                toast({
-                    title: "Id is required",
-                    variant: 'destructive',
-                });
-                throw new Error("Id is required");
-            }
-            
-            const response = await axios.get('/api/publish', {  params: { id } });
-            if (!response) {
-                console.log('Error publishing blog', response);
-                toast({
-                    title: "Failed to publish blog",
-                    variant: 'destructive',
-                });
-                return;
-            }
-            console.log('Blog Published successfully', response);
-            toast({
-                title: "Blog Published successfully",
-            });
-            fetchData();
-        }
-        catch (err) {
-            toast({
-                title: "Failed to publish blog",
-                variant: 'destructive',
-                description:err?.message,
-            });
-            console.log(err);
-        }
+        await publishDraft(id);
+        fetchPublishedAndUnpublishedData();
     }
+
     const handlePreview = (slug) => {
         router.push(`/blogs/${slug}`)
     };
+
     return (
         <div className="mt-5">
             <h1 className="text-center font-extrabold text-3xl mb-5">Drafts</h1>
             <div className="flex flex-wrap gap-5  justify-center items-center">
-                {data.map((blog) => (
+                {draftData.map((blog) => (
                     <Card key={blog._id} className="h-[20rem]  w-[20rem]" >
                         <CardHeader className="flex flex-row justify-between place-items-start">
                             <CardTitle className="leading-6" onClick={() => { handlePreview(blog.slug) }}><h5>{blog.title.toUpperCase()}</h5></CardTitle>

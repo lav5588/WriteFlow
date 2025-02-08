@@ -16,42 +16,43 @@ import {
 } from "@/components/ui/avatar"
 import { UpdateProfile } from '@/components/user-profile-features/update-profile';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { fetchDraftData, fetchPublishedData, fetchUserDataByUserName } from '@/network-call/userProfile.networkCall';
 
 const Page = () => {
+
   // Define the state type
   const [user, setUser] = useState(null);
   const { toast } = useToast();
   const params = useParams();
   const session = useSession();
+  const [draftData, setDraftData] = useState([]);
+  const [publishedData, setPublishedData] = useState([]);
 
-  const fetchSession = async () => {
-    try {
-      const response = await axios.get(`/api/u/${params.username}`);
-      if (!response) {
-        console.log("No user found with this username");
-        toast({
-          variant: "destructive",
-          title: "No user found with this username",
-        })
-        return;
-      }
-      console.log(response);
-      setUser(response.data);
-    } catch (error) {
-      console.log("Error in fetching user data: ", error);
-      toast({
-        variant: "destructive",
-        title: "Error fetching user data",
-        description: error?.message,
-      })
 
+  const fetchUserData = async () => {
+    const userData = await fetchUserDataByUserName(params.username)
+    setUser(userData);
+  }
+
+
+  // this is for draft and publish tabs
+  async function fetchPublishedAndUnpublishedData() {
+    const pubData = await fetchPublishedData(params.username);
+    console.log("pubData: ",pubData);
+    setPublishedData(pubData);
+    if (session?.data?.user?.username === params.username) {
+      const drData = await fetchDraftData();
+      console.log("drData: ", drData);
+      setDraftData(drData);
     }
-  };
+  }
 
   useEffect(() => {
+    fetchUserData();
+    fetchPublishedAndUnpublishedData();
+  }, [session]);
 
-    fetchSession();
-  }, []);
+
 
   if (!user) {
     return <div>Loading..</div>;
@@ -101,7 +102,7 @@ const Page = () => {
             <div>Bio: {user.bio}</div>
           </CardContent>
           <CardFooter>
-            {session?.data?.user?.username == user?.username && <UpdateProfile user={user} fetchSession={fetchSession} />}
+            {session?.data?.user?.username == user?.username && <UpdateProfile user={user} fetchUserData={fetchUserData} />}
           </CardFooter>
         </Card>
 
@@ -115,10 +116,17 @@ const Page = () => {
                 {session?.data?.user?.username == user?.username && <TabsTrigger value="draft">Drafts</TabsTrigger>}
               </TabsList>
               <TabsContent value="draft">
-                <Drafts />
+                <Drafts
+                  draftData={draftData}
+                  fetchPublishedAndUnpublishedData={fetchPublishedAndUnpublishedData}
+                />
+
               </TabsContent>
               <TabsContent value="published">
-                <Published username={params.username} />
+                <Published username={params.username}
+                  publishedData={publishedData}
+                  fetchPublishedAndUnpublishedData={fetchPublishedAndUnpublishedData}
+                />
               </TabsContent>
             </Tabs>
           </div>

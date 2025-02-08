@@ -26,6 +26,7 @@ import {
 import { signIn, useSession} from "next-auth/react";
 import { usernameValidation } from "@/schemas/signUpSchema";
 import { useRouter } from "next/navigation";
+import updateSessionData from "@/lib/updateSessionData";
 
 
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -38,7 +39,7 @@ const profileSchema = z.object({
     bio: z.string().max(250),
 });
 
-export function UpdateProfile({ user, fetchSession}) {
+export function UpdateProfile({ user, fetchUserData}) {
     const [isOpen, setIsOpen] = useState(false);
     const { toast } = useToast();
     const [profileImageLink, setProfileImageLink] = useState(user.profileImage);
@@ -78,9 +79,9 @@ export function UpdateProfile({ user, fetchSession}) {
                 router.push(values.username);
             }
             else{
-                await fetchSession();
+                await fetchUserData();
             }
-            await signIn("credentials",{identifier:"", password:"",redirect: false});
+            await updateSessionData();
         }
         catch (error) {
             console.log("update profile error: ", error);
