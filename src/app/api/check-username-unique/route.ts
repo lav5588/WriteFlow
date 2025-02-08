@@ -2,6 +2,7 @@ import dbConnect from '@/lib/dbConnect';
 import UserModel from '@/models/user.model';
 import { z } from 'zod';
 import { ApiResponse } from '@/types/ApiResponse';
+import { auth } from '@/auth';
 
 
 export async function GET(request: Request) {
@@ -10,11 +11,22 @@ export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const username = searchParams.get('username');
+        const session = await auth();
+
+        if(session?.user?.username == username){
+            const response: ApiResponse = {
+                status: 200,
+                success: true,
+                message: 'User is authenticated',
+            }
+            return Response.json(response);
+        }
 
         const existingVerifiedUser = await UserModel.findOne({
             username,
             isVerified: true,
         });
+
 
         if (existingVerifiedUser) {
             const response: ApiResponse = {

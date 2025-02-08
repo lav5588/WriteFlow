@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useEffect, useRef, useState } from "react";
+import {  useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -11,7 +11,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Form, FormControl, FormField, FormItem,  FormMessage } from "../ui/form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,7 +23,9 @@ import {
     AvatarFallback,
     AvatarImage,
 } from "@/components/ui/avatar"
-import { signIn, useSession } from "next-auth/react";
+import { signIn, useSession} from "next-auth/react";
+import { usernameValidation } from "@/schemas/signUpSchema";
+import { useRouter } from "next/navigation";
 
 
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -31,20 +33,27 @@ const profileSchema = z.object({
     profileImage: z
         .any()
         .optional(),
+    name: z.string().min(3).max(50),
+    username: usernameValidation,
+    bio: z.string().max(250),
 });
 
-export function UpdateProfile({ user, fetchSession }) {
+export function UpdateProfile({ user, fetchSession}) {
     const [isOpen, setIsOpen] = useState(false);
     const { toast } = useToast();
     const [profileImageLink, setProfileImageLink] = useState(user.profileImage);
     const [prImage, setPrImage] = useState("");
     const inputRef = useRef();
+    const router = useRouter();
     const session = useSession();
 
     const form = useForm<z.infer<typeof profileSchema>>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
-            profileImage: ""
+            profileImage: "",
+            name:user.name,
+            username:user.username,
+            bio: user.bio,
         },
     });
 
@@ -60,10 +69,18 @@ export function UpdateProfile({ user, fetchSession }) {
             console.log("User: ", form.getValues());
             const formData = new FormData();
             formData.append("profileImage", values.profileImage);
+            formData.append("name", values.name);
+            formData.append("username", values.username);
+            formData.append("bio", values.bio);
             const response = await axios.put("/api/update-profile", formData);
             console.log("response: ", response.data);
+            if(session.data?.user.username != values.username){
+                router.push(values.username);
+            }
+            else{
+                await fetchSession();
+            }
             await signIn("credentials",{identifier:"", password:"",redirect: false});
-            await fetchSession();
         }
         catch (error) {
             console.log("update profile error: ", error);
@@ -124,11 +141,50 @@ export function UpdateProfile({ user, fetchSession }) {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
-                                        <Input placeholder="Enter your old password" {...field} type="file"
+                                        <Input placeholder="" {...field} type="file"
                                             onChange={handleChange}
                                             value={prImage}
                                             className="hidden"
                                             ref={inputRef}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input placeholder="Enter your Name" {...field} type="text"
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="username"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input placeholder="Enter your Username" {...field} type="text"
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="bio"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input placeholder="Update your Bio" {...field} type="text"
                                         />
                                     </FormControl>
                                     <FormMessage />

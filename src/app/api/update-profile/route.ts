@@ -19,6 +19,9 @@ export async function PUT(request: Request): Promise<Response> {
         }
         const data = await request.formData();
         const profileImage = data.get("profileImage");
+        const name = data.get("name");
+        const username = data.get("username");
+        const bio = data.get("bio");
         if (profileImage) {
             const profileImageUrl = await uploadOnCloudinary(profileImage as File);
             if (!profileImageUrl) {
@@ -31,12 +34,25 @@ export async function PUT(request: Request): Promise<Response> {
             }
             session.user.profileImage = profileImageUrl;
         }
-    
-        await user.save();
+
+        if(typeof bio === "string" && bio.trim()!= "") {
+            user.bio = bio;
+        }
+
+        if(typeof name === "string" && name.trim() != "") {
+            user.name = name.trim();
+        }
+
+        if(typeof username === "string" && username.trim()!= "") {
+            user.username = username.trim();
+        }
+
+        
+        const res = await user.save();
     
         // console.log("session: ", session);
     
-        return Response.json({ session, user }, { status: 200 });
+        return Response.json({res, session, user,name,username,bio:user.bio}, { status: 200 });
     } catch (error) {
         console.log("error: ", error);
         return Response.json({error},{status: 500});

@@ -69,7 +69,7 @@ const Page = () => {
     <>
 
       <div className='flex justify-center items-center flex-col'>
-        <Card className='mb-5'>
+        <Card className='mb-5 md:max-w-[50%]'>
           <CardHeader className='flex jutify-center items-center'>
             <CardTitle>User Profile</CardTitle>
             <div className="relative h-[5rem] w-[5rem] ml-5">
@@ -93,10 +93,12 @@ const Page = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div>username: {user.username}</div>
-            <div>email: {user.email}</div>
-            <div>role: {user.role}</div>
-            <div>verified: {user.isVerified ? 'true' : 'false'}</div>
+            <div>Name: {user.name}</div>
+            <div>Username: {user.username}</div>
+            <div>Email: {user.email}</div>
+            <div>Role: {user.role}</div>
+            <div>Verified: {user.isVerified ? 'true' : 'false'}</div>
+            <div>Bio: {user.bio}</div>
           </CardContent>
           <CardFooter>
             {session?.data?.user?.username == user?.username && <UpdateProfile user={user} fetchSession={fetchSession} />}

@@ -20,7 +20,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 await dbConnect();
                 const session = await auth();
                 if(session?.user) {
-                    const user =await UserModel.findOne({ username:session?.user.username });
+                    const user =await UserModel.findOne({ email:session?.user.email });
                     if (user) {
                         return user;
                     }
