@@ -20,7 +20,7 @@ export const slugValidation = z
     });
 
 export const blogSchema = z.object({
-    title: z.string().min(5,'title should be atleast 5 characters'),
+    title: z.string().min(5, 'title should be atleast 5 characters'),
     content: z.string(),
     slug: slugValidation,
     isPublished: z.boolean(),

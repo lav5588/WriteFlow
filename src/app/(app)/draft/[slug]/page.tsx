@@ -7,6 +7,7 @@ import CreateBlog from "../../create-blog/page";
 import { useDispatch } from "react-redux";
 import { setIsPublished } from "@/components/store/slices/blogSlice";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 
 const Page = () => {
@@ -15,6 +16,7 @@ const Page = () => {
   const params = useParams();
   const [data, setData] = useState(null)
   const {toast} = useToast();
+  const [isLoading, setIsLoading] = useState(true)
 
 
   useEffect(() => {
@@ -42,10 +44,18 @@ const Page = () => {
           description: error?.message,
         })
       }
+      finally{
+        setIsLoading(false)
+      }
     }
     fetchData();
   }, [])
 
+  if (isLoading) {
+    return <div className="flex justify-center items-center">
+                <Loader2 className="h-10 w-10 animate-spin" />
+            </div>
+}
 
   if (!data) {
     return <div>Blogs not found</div>  // Show loading state while data is being fetched

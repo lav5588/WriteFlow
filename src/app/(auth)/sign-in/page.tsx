@@ -1,13 +1,12 @@
 'use client'
 
-import { auth } from "@/auth"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 import { signInSchema } from "@/schemas/signInSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { signIn } from 'next-auth/react';
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -29,10 +28,12 @@ const page = () => {
     });
     const { toast } = useToast();
     const [viewPassword, setViewPassword] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
 
     const onSubmit = async (values: z.infer<typeof signInSchema>) => {
         try {
+            setIsSubmitting(true);
             const response = await signIn("credentials", {
                 ...values,
                 redirect: false,
@@ -59,6 +60,9 @@ const page = () => {
                 title: "Error signing in",
                 description: error?.message,
             })
+        }
+        finally{
+            setIsSubmitting(false);
         }
     };
 
@@ -96,7 +100,8 @@ const page = () => {
                         )}
                     />
 
-                    <Button type="submit" >Submit</Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? <><Loader2 className="animate-spin" />Logging In</> : "LogIn"}</Button>
                 </form>
             </Form>
             <Link href={'/forgot-password'} className="underline">Forget Password</Link>

@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import axios from "axios"
+import { Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -19,6 +20,7 @@ const Page = () => {
     const [data, setData] = useState([])
     const router = useRouter();
     const { toast } = useToast();
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -33,11 +35,20 @@ const Page = () => {
                     title: error?.message,
                 })
             }
+            finally {
+                setIsLoading(false);
+            }
         }
         fetchData()
     }, [])
 
-    if (!data || data.length == 0) {
+    if (isLoading) {
+        return <div className="flex justify-center items-center">
+                    <Loader2 className="h-10 w-10 animate-spin" />
+                </div>
+    }
+
+    if (!data || data.length === 0) {
         return <div>There is no blogs</div>
     }
 
@@ -57,7 +68,7 @@ const Page = () => {
                         </CardHeader>
                         <CardContent onClick={() => { handleClick(blog.slug) }} className="cursor-pointer">
                             <div
-                                dangerouslySetInnerHTML={{ __html: truncateHTML(blog.content,200) }}
+                                dangerouslySetInnerHTML={{ __html: truncateHTML(blog.content, 200) }}
                             />
                         </CardContent>
                     </Card>

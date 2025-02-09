@@ -3,10 +3,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
-import { EllipsisVertical, GalleryThumbnails, Pencil, Trash2, Undo2 } from "lucide-react";
+import { EllipsisVertical, GalleryThumbnails, Loader2, Pencil, Trash2, Undo2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog"
 import { useSession } from "next-auth/react"
 import { deletePublishedBlog, unPublishThePublishedBlog } from "@/network-call/userProfile.networkCall"
+import { useState } from "react";
 
 
 const truncateHTML = (html: string, maxLength: number) => {
@@ -21,11 +22,12 @@ const truncateHTML = (html: string, maxLength: number) => {
 const Published = ({ username, publishedData, fetchPublishedAndUnpublishedData }) => {
     const router = useRouter();
     const session = useSession();
-
+    const [isUnPublishing, setIsUnPublishing] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
 
 
     const handleDelete = async (slug) => {
-        await deletePublishedBlog(slug);
+        await deletePublishedBlog(slug,setIsDeleting);
         fetchPublishedAndUnpublishedData();
     }
 
@@ -43,7 +45,7 @@ const Published = ({ username, publishedData, fetchPublishedAndUnpublishedData }
 
 
     const handleUnpublish = async (id) => {
-        await unPublishThePublishedBlog(id);
+        await unPublishThePublishedBlog(id,setIsUnPublishing);
         fetchPublishedAndUnpublishedData();
     }
 
@@ -64,7 +66,7 @@ const Published = ({ username, publishedData, fetchPublishedAndUnpublishedData }
                                 <DropdownMenuContent>
                                     <DropdownMenuItem onClick={() => { handleClick(blog.slug) }}><GalleryThumbnails />View</DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleEdit(blog.slug)}><Pencil />Edit</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleUnpublish(blog._id)}><Undo2 />Unpublish</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleUnpublish(blog._id)} disabled = {isUnPublishing}>{isUnPublishing?<><Loader2 className="animate-spin"/>Unpublishing</>:<><Undo2 />Unpublish</>}</DropdownMenuItem>
                                     <DropdownMenuItem className="text-red-400" onClick={(e) => e.preventDefault()}>
                                         <AlertDialog>
                                             <AlertDialogTrigger className="flex justify-center items-end" ><Trash2 className="w-4" />&nbsp;Delete</AlertDialogTrigger>
@@ -72,13 +74,13 @@ const Published = ({ username, publishedData, fetchPublishedAndUnpublishedData }
                                                 <AlertDialogHeader>
                                                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                                                     <AlertDialogDescription>
-                                                        This action cannot be undone. This will permanently delete your account
+                                                        This action cannot be undone. This will permanently delete this blog
                                                         and remove your data from our servers.
                                                     </AlertDialogDescription>
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDelete(blog.slug)}>Continue</AlertDialogAction>
+                                                    <AlertDialogAction onClick={() => handleDelete(blog.slug)} className="text-red-500" disabled={isDeleting}>{isDeleting?<><Loader2 className="animate-spin"/>Deleting</>:<><Trash2/>Delete</>}</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>

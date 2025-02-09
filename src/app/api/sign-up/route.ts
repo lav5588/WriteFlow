@@ -9,13 +9,13 @@ export async function POST(request: Request) {
   console.log("Hi");
   try {
     const { username, email, password } = await request.json();
-     if (!username ||!email ||!password) {
-      const response:ApiResponse = {
+    if (!username || !email || !password) {
+      const response: ApiResponse = {
         status: 400,
         success: false,
         message: 'All fields are required',
       }
-      return Response.json(response);
+      return Response.json(response,{status: 200});
     }
 
     const existingVerifiedUserByUsername = await UserModel.findOne({
@@ -24,26 +24,26 @@ export async function POST(request: Request) {
     });
 
     if (existingVerifiedUserByUsername) {
-        const response:ApiResponse = {
-            status: 400,
-            success: false,
-            message: 'User already exists with this username',
-            }
-        return Response.json(response);
+      const response: ApiResponse = {
+        status: 400,
+        success: false,
+        message: 'User already exists with this username',
+      }
+      return Response.json(response,{status:400});
     }
-    
+
 
     const existingUserByEmail = await UserModel.findOne({ email });
     let verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     if (existingUserByEmail) {
       if (existingUserByEmail.isVerified) {
-        const response:ApiResponse = {
-            status: 400,
-            success: false,
-            message: 'User already exists with this email',
-            }
-        return Response.json(response);
+        const response: ApiResponse = {
+          status: 400,
+          success: false,
+          message: 'User already exists with this email',
+        }
+        return Response.json(response,{status: 400});
       } else {
         const hashedPassword = await bcrypt.hash(password, 10);
         existingUserByEmail.password = hashedPassword;
@@ -75,30 +75,30 @@ export async function POST(request: Request) {
       verifyCode
     );
     if (!emailResponse.success) {
-      const response:ApiResponse = {
+      const response: ApiResponse = {
         status: 500,
         success: false,
-        message:  emailResponse.message,
+        message: emailResponse.message,
       }
-      return Response.json(response);
+      return Response.json(response,{status: 500});
     }
 
-    const response:ApiResponse = {
-        status: 201,
-        success: true,
-        message:  'User registered successfully. Please verify your account.',
+    const response: ApiResponse = {
+      status: 201,
+      success: true,
+      message: 'User registered successfully. Please verify your account.',
     }
-    return Response.json(response);
+    return Response.json(response,{status: 200});
 
-  } catch (error:any) {
+  } catch (error: any) {
     console.error('Error registering user:', error);
-    const resaponse:ApiResponse ={
-        status: 500,
-        success: false,
-        message: 'Error registering user',
-        error: error.message,
-  
+    const response: ApiResponse = {
+      status: 500,
+      success: false,
+      message: 'Error registering user',
+      error: error.message,
+
     }
-    return Response.json(resaponse);
+    return Response.json(response,{status:500});
   }
 }

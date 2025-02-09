@@ -10,7 +10,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, PencilLine } from "lucide-react";
+import { Eye, EyeOff, Loader2, PencilLine } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 
@@ -33,6 +33,7 @@ export default function ChangePassword() {
             confirmNewPassword: "",
         },
     });
+    const [isSubmitting,setIsSubmitting] = useState(false);
 
     async function onSubmit(values: z.infer<typeof passWordSchema>) {
         console.log("Form submitted with values:", values);
@@ -44,16 +45,15 @@ export default function ChangePassword() {
             return;
         }
         try {
+            setIsSubmitting(true);
             const response = await axios.post("/api/change-password", values);
             console.log("change password response: ", response);
             if (response.status === 200) {
                 toast({
                     title: "Password changed successfully",
                 });
-
                 router.push('/');
             }
-
         } catch (error) {
             console.log("change password error: ", error);
             toast({
@@ -64,6 +64,7 @@ export default function ChangePassword() {
         }
         finally {
             form.reset();
+            setIsSubmitting(false);
         }
     }
     return (
@@ -125,7 +126,8 @@ export default function ChangePassword() {
                             />
                         </CardContent>
                         <CardFooter className="flex justify-between">
-                            <Button type="submit">Submit</Button>
+                            <Button type="submit" disabled={isSubmitting}>
+                                {isSubmitting?<><Loader2 className="animate-spin"/>Submitting</>:"Submit"}</Button>
                         </CardFooter>
                     </form>
                 </Form>

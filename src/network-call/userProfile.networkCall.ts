@@ -41,9 +41,10 @@ export async function fetchDraftData() {
     }
 }
 
-export async function deleteDraft(slug) {
+export async function deleteDraft(slug,setIsDeleting) {
 
     try {
+        setIsDeleting(true);
         const response = await axios.delete(`/api/delete-blog/${slug}`);
         if (!response) {
             console.log("Error in deleting blog");
@@ -65,9 +66,12 @@ export async function deleteDraft(slug) {
         });
         console.log("Error in deleting data: ", error);
     }
+    finally{
+        setIsDeleting(false);
+    }
 }
 
-export async function publishDraft(id) {
+export async function publishDraft(id,setIsPublishing) {
 
     try {
         if (!id) {
@@ -77,6 +81,7 @@ export async function publishDraft(id) {
             });
             throw new Error("Id is required");
         }
+        setIsPublishing(true);
         const response = await axios.get('/api/publish', { params: { id } });
         if (!response) {
             toast({
@@ -98,6 +103,9 @@ export async function publishDraft(id) {
         });
         console.log(err);
     }
+    finally{
+        setIsPublishing(false);
+    }
 }
 
 export async function fetchPublishedData(username) {
@@ -115,9 +123,10 @@ export async function fetchPublishedData(username) {
     }
 }
 
-export async function deletePublishedBlog(slug) {
+export async function deletePublishedBlog(slug,setIsDeleting) {
 
     try {
+        setIsDeleting(true);
         const response = await axios.delete(`/api/delete-blog/${slug}`);
         if (!response) {
             console.log("Error in deleting blog");
@@ -139,9 +148,12 @@ export async function deletePublishedBlog(slug) {
             description: error?.message,
         });
     }
+    finally{
+        setIsDeleting(false);
+    }
 }
 
-export async function unPublishThePublishedBlog(id) {
+export async function unPublishThePublishedBlog(id,setIsUnPublishing) {
 
     try {
         // console.log("hello");
@@ -153,7 +165,7 @@ export async function unPublishThePublishedBlog(id) {
             });
             throw new Error("Id is required");
         }
-
+        setIsUnPublishing(true)
         const response = await axios.get('/api/publish', { params: { id } });
         if (!response) {
             console.log('Error unpublishing blog', response);
@@ -175,5 +187,8 @@ export async function unPublishThePublishedBlog(id) {
             variant: 'destructive',
             description: err?.message,
         });
+    }
+    finally{
+        setIsUnPublishing(false);
     }
 }

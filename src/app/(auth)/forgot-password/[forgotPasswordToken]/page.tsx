@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useState } from 'react';
-import { Badge, CircleCheck, Eye, EyeOff } from 'lucide-react';
+import { Badge, CircleCheck, Eye, EyeOff, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -38,6 +38,7 @@ const ForgotPasswordPage: React.FC = () => {
         },
     })
     const [viewPassword, setViewPassword] = useState(false);
+    const [isSubmitting,setIsSubmitting] = useState(false);
 
     async function onSubmit(values: z.infer<typeof emailSchema>) {
         if (values.newPassword !== values.confirmPassword) {
@@ -46,6 +47,7 @@ const ForgotPasswordPage: React.FC = () => {
         }
 
         try {
+            setIsSubmitting(true);
             const response = await axios.post(`/api/forgot-password`, values);
             if (!response) {
                 toast({
@@ -65,6 +67,9 @@ const ForgotPasswordPage: React.FC = () => {
                 title: 'Invalid link',
                 description: error?.message,
             })
+        }
+        finally {
+            setIsSubmitting(false);
         }
 
     }
@@ -102,7 +107,8 @@ const ForgotPasswordPage: React.FC = () => {
                         </FormItem>
                     )}
                 />
-                <Button type="submit">Submit</Button>
+                <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting?<><Loader2 className="animate-spin"/>Submitting</>:"Submit"}</Button>
             </form>
         </Form>
     )

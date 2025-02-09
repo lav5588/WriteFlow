@@ -1,6 +1,6 @@
 'use client'
 
-import {  useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -11,19 +11,19 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem,  FormMessage } from "../ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "../ui/form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
-import { PencilLine } from "lucide-react";
+import { Loader2, PencilLine } from "lucide-react";
 import {
     Avatar,
     AvatarFallback,
     AvatarImage,
 } from "@/components/ui/avatar"
-import { signIn, useSession} from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { usernameValidation } from "@/schemas/signUpSchema";
 import { useRouter } from "next/navigation";
 import updateSessionData from "@/lib/updateSessionData";
@@ -39,7 +39,7 @@ const profileSchema = z.object({
     bio: z.string().max(250),
 });
 
-export function UpdateProfile({ user, fetchUserData}) {
+export function UpdateProfile({ user, fetchUserData }) {
     const [isOpen, setIsOpen] = useState(false);
     const { toast } = useToast();
     const [profileImageLink, setProfileImageLink] = useState(user.profileImage);
@@ -47,13 +47,14 @@ export function UpdateProfile({ user, fetchUserData}) {
     const inputRef = useRef();
     const router = useRouter();
     const session = useSession();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const form = useForm<z.infer<typeof profileSchema>>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
             profileImage: "",
-            name:user.name,
-            username:user.username,
+            name: user.name,
+            username: user.username,
             bio: user.bio,
         },
     });
@@ -66,6 +67,7 @@ export function UpdateProfile({ user, fetchUserData}) {
 
     async function onSubmit(values: z.infer<typeof profileSchema>) {
         try {
+            setIsSubmitting(true);
             console.log("Form submitted with values:", values);
             console.log("User: ", form.getValues());
             const formData = new FormData();
@@ -75,10 +77,10 @@ export function UpdateProfile({ user, fetchUserData}) {
             formData.append("bio", values.bio);
             const response = await axios.put("/api/update-profile", formData);
             console.log("response: ", response.data);
-            if(session.data?.user.username != values.username){
+            if (session.data?.user.username != values.username) {
                 router.push(values.username);
             }
-            else{
+            else {
                 await fetchUserData();
             }
             await updateSessionData();
@@ -95,6 +97,7 @@ export function UpdateProfile({ user, fetchUserData}) {
             form.reset();
             setIsOpen(false);
             setPrImage("")
+            setIsSubmitting(false);
         }
 
     }
@@ -192,7 +195,8 @@ export function UpdateProfile({ user, fetchUserData}) {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit">Save</Button>
+                        <Button type="submit" disabled={isSubmitting}>
+                            {isSubmitting ? <><Loader2 className="animate-spin" />Saving</> : "Save"}</Button>
                     </form>
                 </Form>
             </DialogContent>

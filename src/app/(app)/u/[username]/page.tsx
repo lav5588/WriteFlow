@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import axios from 'axios';
 import { useParams } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Drafts from '@/components/userTabs/drafts';
@@ -17,34 +16,38 @@ import {
 import { UpdateProfile } from '@/components/user-profile-features/update-profile';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { fetchDraftData, fetchPublishedData, fetchUserDataByUserName } from '@/network-call/userProfile.networkCall';
+import { Loader2 } from 'lucide-react';
 
 const Page = () => {
 
-  // Define the state type
   const [user, setUser] = useState(null);
   const { toast } = useToast();
   const params = useParams();
   const session = useSession();
   const [draftData, setDraftData] = useState([]);
   const [publishedData, setPublishedData] = useState([]);
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
+  const [isDraftAndPublishedDataLoading, setIsDraftAndPublishedDataLoading] = useState(true);
 
 
   const fetchUserData = async () => {
     const userData = await fetchUserDataByUserName(params.username)
     setUser(userData);
+    setIsProfileLoading(false);
   }
 
 
   // this is for draft and publish tabs
   async function fetchPublishedAndUnpublishedData() {
     const pubData = await fetchPublishedData(params.username);
-    console.log("pubData: ",pubData);
+    console.log("pubData: ", pubData);
     setPublishedData(pubData);
     if (session?.data?.user?.username === params.username) {
       const drData = await fetchDraftData();
       console.log("drData: ", drData);
       setDraftData(drData);
     }
+    setIsDraftAndPublishedDataLoading(false);
   }
 
   useEffect(() => {
@@ -54,57 +57,65 @@ const Page = () => {
 
 
 
-  if (!user) {
-    return <div>Loading..</div>;
-  }
-
-  if (user.message) {
+  if (user?.message) {
     return <div>{user.message}</div>;  // Display error message if any
   }
-  else if (!user.username) {
-    return <div>Internal Server Error</div>
-  }
+  // else if (!user?.username) {
+  //   return <div>Internal Server Error</div>
+  // }
 
 
   return (
     <>
 
       <div className='flex justify-center items-center flex-col'>
-        <Card className='mb-5 md:max-w-[50%]'>
-          <CardHeader className='flex jutify-center items-center'>
-            <CardTitle>User Profile</CardTitle>
-            <div className="relative h-[5rem] w-[5rem] ml-5">
-              {user?.profileImage === "" && <Avatar className="h-full w-full">
-                <AvatarImage
-                  src={user.profileImage} alt={user.username} />
-                <AvatarFallback >{user.username[0].toLocaleUpperCase()}</AvatarFallback>
-              </Avatar>}
-              {user?.profileImage !== "" && <Dialog>
-                <DialogTrigger>
-                  <Avatar className="h-full w-full">
-                    <AvatarImage
-                      src={user.profileImage} alt={user.username} />
-                    <AvatarFallback >{user.username[0].toLocaleUpperCase()}</AvatarFallback>
-                  </Avatar>
-                </DialogTrigger>
-                <DialogContent>
-                  <img src={user.profileImage} alt="userImage" className='pt-2' />
-                </DialogContent>
-              </Dialog>}
+        <Card className='mb-5 md:max-w-[50%] min-w-[30rem] min-h-[25rem]'>
+          {isProfileLoading ? (
+            <div className="flex justify-center items-center">
+              <Loader2 className="h-10 w-10 animate-spin" />
             </div>
-          </CardHeader>
-          <CardContent>
-            <div>Name: {user.name}</div>
-            <div>Username: {user.username}</div>
-            <div>Email: {user.email}</div>
-            <div>Role: {user.role}</div>
-            <div>Verified: {user.isVerified ? 'true' : 'false'}</div>
-            <div>Bio: {user.bio}</div>
-          </CardContent>
-          <CardFooter>
-            {session?.data?.user?.username == user?.username && <UpdateProfile user={user} fetchUserData={fetchUserData} />}
-          </CardFooter>
+          ) : (
+            <>
+              <CardHeader className='flex justify-center items-center'>
+                <CardTitle>User Profile</CardTitle>
+                <div className="relative h-[5rem] w-[5rem] ml-5">
+                  {user?.profileImage === "" ? (
+                    <Avatar className="h-full w-full">
+                      <AvatarImage
+                        src={user.profileImage} alt={user.username} />
+                      <AvatarFallback>{user.username[0].toLocaleUpperCase()}</AvatarFallback>
+                    </Avatar>
+                  ) : (
+                    <Dialog>
+                      <DialogTrigger>
+                        <Avatar className="h-full w-full">
+                          <AvatarImage
+                            src={user.profileImage} alt={user.username} />
+                          <AvatarFallback>{user.username[0].toLocaleUpperCase()}</AvatarFallback>
+                        </Avatar>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <img src={user.profileImage} alt="userImage" className='pt-2' />
+                      </DialogContent>
+                    </Dialog>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div>Name: {user.name}</div>
+                <div>Username: {user.username}</div>
+                <div>Email: {user.email}</div>
+                <div>Role: {user.role}</div>
+                <div>Verified: {user.isVerified ? 'true' : 'false'}</div>
+                <div>Bio: {user.bio}</div>
+              </CardContent>
+              <CardFooter>
+                {session?.data?.user?.username === user?.username && <UpdateProfile user={user} fetchUserData={fetchUserData} />}
+              </CardFooter>
+            </>
+          )}
         </Card>
+
 
         {/* Tabs */}
 
@@ -115,18 +126,23 @@ const Page = () => {
                 <TabsTrigger value="published">Published</TabsTrigger>
                 {session?.data?.user?.username == user?.username && <TabsTrigger value="draft">Drafts</TabsTrigger>}
               </TabsList>
+
               <TabsContent value="draft">
-                <Drafts
+                {isDraftAndPublishedDataLoading ? <div className="flex justify-center items-center">
+                  <Loader2 className="h-10 w-10 animate-spin" />
+                </div> : <Drafts
                   draftData={draftData}
                   fetchPublishedAndUnpublishedData={fetchPublishedAndUnpublishedData}
-                />
+                />}
 
               </TabsContent>
               <TabsContent value="published">
-                <Published username={params.username}
+                {isDraftAndPublishedDataLoading ? <div className="flex justify-center items-center">
+                  <Loader2 className="h-10 w-10 animate-spin" />
+                </div> : <Published username={params.username}
                   publishedData={publishedData}
                   fetchPublishedAndUnpublishedData={fetchPublishedAndUnpublishedData}
-                />
+                />}
               </TabsContent>
             </Tabs>
           </div>

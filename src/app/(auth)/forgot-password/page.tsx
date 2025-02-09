@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useState } from 'react';
-import { CircleCheck } from 'lucide-react';
+import { CircleCheck, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
 
@@ -27,6 +27,7 @@ const emailSchema = z.object({
 const ForgotPasswordPage: React.FC = () => {
     const {toast} = useToast();
     const [isEmailSent,setIsEmailSent] = useState(false);
+    const [isSubmitting,setIsSubmitting] = useState(false);
     const form = useForm<z.infer<typeof emailSchema>>({
         resolver: zodResolver(emailSchema),
         defaultValues: {
@@ -38,6 +39,7 @@ const ForgotPasswordPage: React.FC = () => {
         
         console.log(values);
         try {
+            setIsSubmitting(true);
             const response = await axios.get(`/api/forgot-password?identifier=${values.identifier}`);
             console.log(response);
             if(!response){
@@ -57,6 +59,9 @@ const ForgotPasswordPage: React.FC = () => {
                 title:'Error in sending email'  ,
             })
             
+        }
+        finally{
+            setIsSubmitting(false);
         }
     }
 
@@ -79,7 +84,8 @@ const ForgotPasswordPage: React.FC = () => {
                         </FormItem>
                     )}
                 />
-                <Button type="submit">Submit</Button>
+                <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting?<><Loader2 className="animate-spin"/>Submitting</>:"Submit"}</Button>
             </form>
         </Form>
     )

@@ -7,10 +7,9 @@ import { useToast } from "@/hooks/use-toast"
 import { signUpSchema } from "@/schemas/signUpSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
-import { Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { title } from "process"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -29,10 +28,12 @@ const page = () => {
     });
     const { toast } = useToast();
     const [viewPassword,setViewPassword] = useState(false);
+    const [isSubmitting,setIsSubmitting] = useState(false);
 
     const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
         console.log(values);
         try {
+            setIsSubmitting(true);
             const response = await axios.post('/api/sign-up', values)
             if (!response) {
                 console.log('Error signing up user', response);
@@ -41,6 +42,7 @@ const page = () => {
                     variant: 'destructive'
                 })
             }
+            console.log("response in signing up: ", response);
             router.push(`/verify/${values.username}`)
         }
         catch (error) {
@@ -50,6 +52,9 @@ const page = () => {
                 description: error?.message,
                 variant: 'destructive'
             })
+        }
+        finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -110,7 +115,8 @@ const page = () => {
                             </FormItem>
                         )}
                     />
-                    <Button type="submit" >Submit</Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting?<><Loader2 className="animate-spin"/>Submitting</>:"Submit"}</Button>
                 </form>
             </Form>
             <Link href={'/forgot-password'} className="underline">Forget Password</Link>

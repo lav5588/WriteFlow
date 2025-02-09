@@ -1,5 +1,4 @@
 'use client'
-
 import RichTextEditor from "@/components/RichtextEditor/richTextEditor"
 import { setId, setIsPublished } from "@/components/store/slices/blogSlice"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from "@/components/ui/form"
@@ -253,7 +252,7 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
                                     <FormItem>
                                         <FormLabel>Title</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="shadcn"  {...field} onChange={(e) => {
+                                            <Input placeholder="Enter the title of Your Blog"  {...field} onChange={(e) => {
                                                 field.onChange(e);
                                                 slugGenerate();
                                             }} />
@@ -269,7 +268,7 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
                                     <FormItem>
                                         <FormLabel>Slug</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="shadcn" {...field}
+                                            <Input placeholder="Update Your Slug If it is not unique" {...field}
                                                 onChange={(e) => {
                                                     field.onChange(e);
                                                     form.clearErrors()

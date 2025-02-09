@@ -7,7 +7,9 @@ import { useToast } from "@/hooks/use-toast"
 import { veryfyCodeSchema } from "@/schemas/verifyCodeSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
+import { Loader2 } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -23,21 +25,26 @@ const page = () => {
             verifyCode: '',
         }
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const onSubmit = async(values: z.infer<typeof veryfyCodeSchema>) => {
-        const data = {username:params.username,code:values.verifyCode}
+    const onSubmit = async (values: z.infer<typeof veryfyCodeSchema>) => {
+        const data = { username: params.username, code: values.verifyCode }
         console.log(data);
         try {
-            const response = await axios.post('/api/verify-code',data);
+            setIsSubmitting(true);
+            const response = await axios.post('/api/verify-code', data);
             console.log(response);
             router.push('/sign-in')
         } catch (error) {
-            console.log("user verification error",error);
+            console.log("user verification error", error);
             toast({
                 title: 'User verification failed',
                 description: error?.message,
-                variant:'destructive'
+                variant: 'destructive'
             })
+        }
+        finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -68,7 +75,8 @@ const page = () => {
                         )}
                     />
 
-                    <Button type="submit" >Submit</Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? <><Loader2 className="animate-spin" />Verifying</> : "Verify"}</Button>
                 </form>
             </Form>
         </div>

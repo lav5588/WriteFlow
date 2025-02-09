@@ -59,11 +59,11 @@ export async function POST(request: Request) {
     } catch (error) {
         console.error('Error verifying user:', error);
         const response: ApiResponse = {
-            status: 400,
+            status: 500,
             success: false,
             message: 'Error verifying user',
             error: error,
         }
-        return Response.json(response,{status:400});
+        return Response.json(response,{status:500});
     }
 }
