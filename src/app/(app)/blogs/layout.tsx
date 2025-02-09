@@ -1,9 +1,9 @@
 
 import type { Metadata } from 'next'
- 
+
 export const metadata: Metadata = {
-  title: 'Blogs | WriteFlow',
-  description: 'This is a blog page',
+    title: 'Blogs | WriteFlow',
+    description: 'This is a blog page',
 }
 
 
@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
     return (
         <div>
-            { children }
+            {children}
         </div>
     );
 }

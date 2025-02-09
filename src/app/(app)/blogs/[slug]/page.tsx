@@ -3,31 +3,32 @@
 import { Card } from "@/components/ui/card";
 import axios from "axios";
 import { useParams } from "next/navigation"
-import { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import '@/components/RichtextEditor/styles.scss';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import { IBlog } from "@/types/blog";
 
 
 
-const Page = () => {
-    const params = useParams();
-    const [blog, setBlog] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+const Page:React.FC = () => {
+    const params = useParams<{ slug: string }>();
+    const [blog, setBlog] = useState<IBlog | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const { toast } = useToast();
 
     useEffect(() => {
         const fetchBlog = async () => {
             try {
                 const response = await axios.get(`/api/blogs/${params.slug}`)
-                const data = response.data;
+                const data:IBlog = response.data;
                 setBlog(data)
-                console.log("blog: ", response);
+                console.log("blog: ", data);
             } catch (error) {
                 toast({
                     variant: "destructive",
-                    title: error?.message,
+                    title:error instanceof Error? error?.message:"Error in fetching the blog",
                 })
                 console.log("error in fetching blog: ", error);
             } finally {
@@ -52,7 +53,6 @@ const Page = () => {
                         dangerouslySetInnerHTML={{ __html: blog.content }}
                     />
                 )}
-
             </Card>
         </div>
     )
