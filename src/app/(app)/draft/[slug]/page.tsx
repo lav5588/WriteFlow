@@ -8,15 +8,16 @@ import { useDispatch } from "react-redux";
 import { setIsPublished } from "@/components/store/slices/blogSlice";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { IBlog } from "@/types/blog";
 
 
-const Page = () => {
-  
+const Page: React.FC = () => {
+
   const dispatch = useDispatch();
   const params = useParams();
-  const [data, setData] = useState(null)
-  const {toast} = useToast();
-  const [isLoading, setIsLoading] = useState(true)
+  const [data, setData] = useState<IBlog | null>(null)
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
 
   useEffect(() => {
@@ -31,20 +32,21 @@ const Page = () => {
           })
           return;
         }
-        setData(response.data)
-        dispatch(setIsPublished(response.data?.isPublished));
+        const resData: IBlog = response.data;
+        setData(resData)
+        dispatch(setIsPublished(resData.isPublished));
         console.log("Fetched draft: ", response.data);
 
       }
-      catch (error) {
+      catch (error: unknown) {
         console.log("Error fetching blog: ", error);
         toast({
           variant: "destructive",
-          title:"Error fetching blog",
-          description: error?.message,
+          title: "Error fetching blog",
+          description: error instanceof Error ? error.message : "Error occur while fetching the blog",
         })
       }
-      finally{
+      finally {
         setIsLoading(false)
       }
     }
@@ -53,9 +55,9 @@ const Page = () => {
 
   if (isLoading) {
     return <div className="flex justify-center items-center">
-                <Loader2 className="h-10 w-10 animate-spin" />
-            </div>
-}
+      <Loader2 className="h-10 w-10 animate-spin" />
+    </div>
+  }
 
   if (!data) {
     return <div>Blogs not found</div>  // Show loading state while data is being fetched
@@ -63,7 +65,7 @@ const Page = () => {
 
   return (
     <div>
-      <CreateBlog title={data.title} slug={data.slug} content={data.content} isUpdate={true} id = {data._id} />
+      <CreateBlog title={data.title} slug={data.slug} content={data.content} isUpdate={true} id={data._id} />
     </div>
   )
 }

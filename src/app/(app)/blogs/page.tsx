@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
+import { IBlog } from "@/types/blog"
 import axios from "axios"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
@@ -9,30 +10,30 @@ import { useRouter } from "next/navigation"
 
 import { useEffect, useState } from "react"
 
-const truncateHTML = (html: string, maxLength: number) => {
+const truncateHTML = (html: string, maxLength: number):string => {
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = html;
     const text = tempDiv.innerText || tempDiv.textContent || "";
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 
-const Page = () => {
-    const [data, setData] = useState([])
+const Page:React.FC = () => {
+    const [data, setData] = useState< IBlog[] >([])
     const router = useRouter();
     const { toast } = useToast();
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get('/api/blogs');
-                console.log("Data fetched: ", response);
-                setData(response.data.data);
+                const data:IBlog[] = response.data.data;
+                setData(data);
             } catch (error) {
                 console.log("Error in fetching data: ", error);
                 toast({
                     variant: "destructive",
-                    title: error?.message,
+                    title:error instanceof Error ?error?.message:"Error in fetching blogs",
                 })
             }
             finally {
@@ -52,7 +53,7 @@ const Page = () => {
         return <div>There is no blogs</div>
     }
 
-    const handleClick = (slug) => {
+    const handleClick = (slug:string) => {
         router.push(`blogs/${slug}`)
     };
 

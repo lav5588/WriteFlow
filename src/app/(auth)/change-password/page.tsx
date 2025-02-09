@@ -18,13 +18,16 @@ const passWordSchema = z.object({
     oldPassword: z.string(),
     newPassword: z.string().min(6, { message: "password must be at least 6 characters" }).max(20, { message: "password must be at most 12 characters" }),
     confirmNewPassword: z.string().min(6, { message: "password must be at least 6 characters" }).max(20, { message: "password must be at most 12 characters" }),
+}).refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "Passwords do not match",
+    path: ["confirmNewPassword"],
 });
 
 export default function ChangePassword() {
     const router = useRouter();
     const { toast } = useToast();
-    const [viewPasswordOld,setViewPasswordOld] = useState(false);
-    const [viewPasswordNew,setViewPasswordNew] = useState(false);
+    const [viewPasswordOld, setViewPasswordOld] = useState<boolean>(false);
+    const [viewPasswordNew, setViewPasswordNew] = useState<boolean>(false);
     const form = useForm<z.infer<typeof passWordSchema>>({
         resolver: zodResolver(passWordSchema),
         defaultValues: {
@@ -33,7 +36,7 @@ export default function ChangePassword() {
             confirmNewPassword: "",
         },
     });
-    const [isSubmitting,setIsSubmitting] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     async function onSubmit(values: z.infer<typeof passWordSchema>) {
         console.log("Form submitted with values:", values);
@@ -54,12 +57,12 @@ export default function ChangePassword() {
                 });
                 router.push('/');
             }
-        } catch (error) {
+        } catch (error: unknown) {
             console.log("change password error: ", error);
             toast({
                 title: "Failed to change password",
                 variant: 'destructive',
-                description: error?.message,
+                description: error instanceof Error ? error.message : "Error while changing Your Password",
             });
         }
         finally {
@@ -85,7 +88,7 @@ export default function ChangePassword() {
                                         <FormLabel>Old Password</FormLabel>
                                         <FormControl>
                                             <div className="relative">
-                                                <Input placeholder="Enter your old password" {...field} type={viewPasswordOld?'text':'password'} className="pr-10"/>
+                                                <Input placeholder="Enter your old password" {...field} type={viewPasswordOld ? 'text' : 'password'} className="pr-10" />
                                                 {!viewPasswordOld && <Eye className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={() => setViewPasswordOld(!viewPasswordOld)} />}
                                                 {viewPasswordOld && <EyeOff className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={() => setViewPasswordOld(!viewPasswordOld)} />}
                                             </div>
@@ -102,7 +105,7 @@ export default function ChangePassword() {
                                         <FormLabel>New Password</FormLabel>
                                         <FormControl>
                                             <div className="relative">
-                                                <Input placeholder="Enter your new password" {...field} type={viewPasswordNew?'text':'password'} className="pr-10" />
+                                                <Input placeholder="Enter your new password" {...field} type={viewPasswordNew ? 'text' : 'password'} className="pr-10" />
                                                 {!viewPasswordNew && <Eye className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={() => setViewPasswordNew(!viewPasswordNew)} />}
                                                 {viewPasswordNew && <EyeOff className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={() => setViewPasswordNew(!viewPasswordNew)} />}
                                             </div>
@@ -127,7 +130,7 @@ export default function ChangePassword() {
                         </CardContent>
                         <CardFooter className="flex justify-between">
                             <Button type="submit" disabled={isSubmitting}>
-                                {isSubmitting?<><Loader2 className="animate-spin"/>Submitting</>:"Submit"}</Button>
+                                {isSubmitting ? <><Loader2 className="animate-spin" />Submitting</> : "Submit"}</Button>
                         </CardFooter>
                     </form>
                 </Form>

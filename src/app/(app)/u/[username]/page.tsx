@@ -6,7 +6,6 @@ import { useParams } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Drafts from '@/components/userTabs/drafts';
 import Published from '@/components/userTabs/Published';
-import { useToast } from '@/hooks/use-toast';
 import { useSession } from 'next-auth/react';
 import {
   Avatar,
@@ -17,17 +16,26 @@ import { UpdateProfile } from '@/components/user-profile-features/update-profile
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { fetchDraftData, fetchPublishedData, fetchUserDataByUserName } from '@/network-call/userProfile.networkCall';
 import { Loader2 } from 'lucide-react';
+import { ISessionUser, IUser } from '@/types/user';
+import { IBlog } from '@/types/blog';
 
-const Page = () => {
+interface ISession {
+  data: {
+    expires: string;
+    user: ISessionUser;
+  } | null;
+  status: string;
+}
 
-  const [user, setUser] = useState(null);
-  const { toast } = useToast();
-  const params = useParams();
-  const session = useSession();
-  const [draftData, setDraftData] = useState([]);
-  const [publishedData, setPublishedData] = useState([]);
-  const [isProfileLoading, setIsProfileLoading] = useState(true);
-  const [isDraftAndPublishedDataLoading, setIsDraftAndPublishedDataLoading] = useState(true);
+const Page: React.FC = () => {
+
+  const [user, setUser] = useState<IUser | null>(null);
+  const params = useParams<{ username: string }>();
+  const session: ISession = useSession();
+  const [draftData, setDraftData] = useState<IBlog[]>([]);
+  const [publishedData, setPublishedData] = useState<IBlog[]>([]);
+  const [isProfileLoading, setIsProfileLoading] = useState<boolean>(true);
+  const [isDraftAndPublishedDataLoading, setIsDraftAndPublishedDataLoading] = useState<boolean>(true);
 
 
   const fetchUserData = async () => {
@@ -41,11 +49,11 @@ const Page = () => {
   async function fetchPublishedAndUnpublishedData() {
     const pubData = await fetchPublishedData(params.username);
     console.log("pubData: ", pubData);
-    setPublishedData(pubData);
+    setPublishedData(pubData || []);
     if (session?.data?.user?.username === params.username) {
       const drData = await fetchDraftData();
       console.log("drData: ", drData);
-      setDraftData(drData);
+      setDraftData(drData || []);
     }
     setIsDraftAndPublishedDataLoading(false);
   }
@@ -55,63 +63,60 @@ const Page = () => {
     fetchPublishedAndUnpublishedData();
   }, [session]);
 
-
-
-  if (user?.message) {
-    return <div>{user.message}</div>;  // Display error message if any
+  if (!user && !isProfileLoading) {
+    return <div>{params.username} not found</div>
   }
-  // else if (!user?.username) {
-  //   return <div>Internal Server Error</div>
-  // }
 
 
   return (
     <>
 
       <div className='flex justify-center items-center flex-col'>
-        <Card className='mb-5 md:max-w-[50%] min-w-[30rem] min-h-[25rem]'>
+        <Card className='mb-5 md:max-w-[50%] md:min-w-[30rem] min-h-[25rem]'>
           {isProfileLoading ? (
             <div className="flex justify-center items-center">
               <Loader2 className="h-10 w-10 animate-spin" />
             </div>
           ) : (
             <>
-              <CardHeader className='flex justify-center items-center'>
-                <CardTitle>User Profile</CardTitle>
-                <div className="relative h-[5rem] w-[5rem] ml-5">
-                  {user?.profileImage === "" ? (
-                    <Avatar className="h-full w-full">
-                      <AvatarImage
-                        src={user.profileImage} alt={user.username} />
-                      <AvatarFallback>{user.username[0].toLocaleUpperCase()}</AvatarFallback>
-                    </Avatar>
-                  ) : (
-                    <Dialog>
-                      <DialogTrigger>
-                        <Avatar className="h-full w-full">
-                          <AvatarImage
-                            src={user.profileImage} alt={user.username} />
-                          <AvatarFallback>{user.username[0].toLocaleUpperCase()}</AvatarFallback>
-                        </Avatar>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <img src={user.profileImage} alt="userImage" className='pt-2' />
-                      </DialogContent>
-                    </Dialog>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div>Name: {user.name}</div>
-                <div>Username: {user.username}</div>
-                <div>Email: {user.email}</div>
-                <div>Role: {user.role}</div>
-                <div>Verified: {user.isVerified ? 'true' : 'false'}</div>
-                <div>Bio: {user.bio}</div>
-              </CardContent>
-              <CardFooter>
-                {session?.data?.user?.username === user?.username && <UpdateProfile user={user} fetchUserData={fetchUserData} />}
-              </CardFooter>
+              {user && <>
+                <CardHeader className='flex justify-center items-center'>
+                  <CardTitle>User Profile</CardTitle>
+                  <div className="relative h-[5rem] w-[5rem] ml-5">
+                    {user?.profileImage === "" ? (
+                      <Avatar className="h-full w-full">
+                        <AvatarImage
+                          src={user.profileImage} alt={user.username} />
+                        <AvatarFallback>{user.username[0].toLocaleUpperCase()}</AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <Dialog>
+                        <DialogTrigger>
+                          <Avatar className="h-full w-full">
+                            <AvatarImage
+                              src={user.profileImage} alt={user.username} />
+                            <AvatarFallback>{user?.username[0].toLocaleUpperCase()}</AvatarFallback>
+                          </Avatar>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <img src={user.profileImage} alt="userImage" className='pt-2' />
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div>Name: {user.name}</div>
+                  <div>Username: {user.username}</div>
+                  <div>Email: {user.email}</div>
+                  <div>Role: {user.role}</div>
+                  <div>Verified: {user.isVerified ? 'true' : 'false'}</div>
+                  <div>Bio: {user.bio}</div>
+                </CardContent>
+                <CardFooter>
+                  {session?.data?.user?.username === user?.username && <UpdateProfile user={user} fetchUserData={fetchUserData} />}
+                </CardFooter>
+              </>}
             </>
           )}
         </Card>

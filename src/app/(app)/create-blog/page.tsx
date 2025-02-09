@@ -1,13 +1,13 @@
 'use client'
 import RichTextEditor from "@/components/RichtextEditor/richTextEditor"
 import { setId, setIsPublished } from "@/components/store/slices/blogSlice"
+import { RootState } from "@/components/store/store"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 import { blogSchema } from "@/schemas/blogSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
-import { usePathname } from "next/navigation"
 import React, { useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
@@ -15,23 +15,29 @@ import { z } from "zod"
 
 
 
+interface ICreateBlogProps {
+    title?: string;
+    slug?: string;
+    content?: string;
+    isUpdate?: boolean;
+    id?: string | null;
+}
 
+type BlogFormData = z.infer<typeof blogSchema>;
 
-
-const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 'Whats on your mind', isUpdate = false, id = null }) => {
+const CreateBlog: React.FunctionComponent<ICreateBlogProps> = ({ title = '', slug = '', content = 'Whats on your mind', isUpdate = false, id = null }) => {
 
 
     const dispatch = useDispatch();
     const { toast } = useToast();
-    const blogId = useSelector((state) => state.blogReducer.id);
-    const isPublished = useSelector(state => state.blogReducer.isPublished);
-    console.log("hello world!");
+    const blogId = useSelector((state: RootState) => state.blogReducer.id);
+    const isPublished = useSelector((state: RootState) => state.blogReducer.isPublished);
 
 
     useEffect(() => {
         dispatch(setId(id));
         dispatch(setIsPublished(isPublished));
-        return () => { 
+        return () => {
             console.log('unmounted')
             dispatch(setId(null));
             dispatch(setIsPublished(false));
@@ -39,7 +45,6 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
     }, [dispatch])
 
 
-    
     const slugValidation = z
         .string()
         .min(5, 'slug must be at least 5 characters')
@@ -64,7 +69,7 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
         isPublished: z.boolean(),
     })
 
-    const form = useForm<z.infer<typeof blogSchema>>({
+    const form = useForm<BlogFormData>({
         resolver: zodResolver(isUpdate ? updateBlogSchema : blogSchema),
         defaultValues: {
             title,
@@ -81,7 +86,7 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
         form.clearErrors()
     }
 
-    const onUpdate = async (content) => {
+    const onUpdate = async (content: string) => {
         const data = { ...form.getValues(), content: content, isPublished: isPublished };
         console.log("data:", data);
         try {
@@ -102,38 +107,44 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
                 title: "Blog updated successfully",
             });
             return response;
-            
-        } catch (error) {
+
+        } catch (error: unknown) {
             console.log('Error', error);
             try {
-                const Error = JSON.parse(error)
-                Error.forEach((err) => {
-                    form.setError(err.path[0], {
-                        type: err.type,
-                        message: err.message,
-                    });
-                })
+                if (typeof error === 'string') {
+                    const Error = JSON.parse(error) as { path: string[]; type: string; message: string }[];
+                    Error.forEach((err) => {
+                        const fieldName = err.path[0] as keyof z.infer<typeof blogSchema>;
+                        if (fieldName in form.getValues()) { // Ensure it's a valid form field
+                            form.setError(fieldName, {
+                                type: err.type,
+                                message: err.message,
+                            });
+                        }
+                    })
+                } else if (error instanceof Error && error.message) {
+                    console.log("Standard Error:", error.message);
+                }
 
             }
-            catch (err) {
-                console.log(err);
+            catch (err: unknown) {
+                console.log('error: ', err);
             }
-
             console.log('Error', error);
 
             toast({
                 variant: "destructive",
                 title: "Error updating blog data",
-                description: error?.message,
+                description: error instanceof Error ? error.message : 'Error in updating blog data',
             });
         }
 
     };
 
-    const onSave = async (content) => {
+    const onSave = async (content: string) => {
         const data = { ...form.getValues(), content: content, isPublished }
         try {
-            if(!id){
+            if (!id) {
                 id = blogId;
             }
             if (id) {
@@ -155,25 +166,30 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
             console.log("response: ", response);
             id = response.data.data._id;
             dispatch(setId(id));
-            console.log("id:",id);
+            console.log("id:", id);
             toast({
                 title: "Blog saved successfully",
             });
             return response;
-        } catch (error) {
+        } catch (error: unknown) {
 
             try {
-                const Error = JSON.parse(error)
-                Error.forEach((err) => {
-                    form.setError(err.path[0], {
-                        type: err.type,
-                        message: err.message,
-                    });
-                })
+                if (typeof error === "string") {
+                    const Error = JSON.parse(error) as { path: string[]; type: string; message: string }[];
+                    Error.forEach((err) => {
+                        const fieldName = err.path[0] as keyof z.infer<typeof blogSchema>;
+                        form.setError(fieldName, {
+                            type: err.type,
+                            message: err.message,
+                        });
+                    })
+                } else if (error instanceof Error && error.message) {
+                    console.log("Standard Error:", error.message);
+                }
 
             }
-            catch (err) {
-                console.log(err);
+            catch (err: unknown) {
+                console.log("error: ", err);
             }
 
             console.log('Error', error);
@@ -181,7 +197,7 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
             toast({
                 variant: "destructive",
                 title: "Error saving blog data",
-                description: error?.message,
+                description: error instanceof Error ? error.message : 'Error while saving the blog',
             });
         }
 
@@ -191,12 +207,12 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
 
 
 
-    const onTogglePublish = async (content) => {
+    const onTogglePublish = async (content: string) => {
         try {
             // console.log("hello");
-            console.log("id: ",id)
+            console.log("id: ", id)
             console.log("blogId: ", blogId);
-            if(!id){
+            if (!id) {
                 id = blogId
             }
             if (!id) {
@@ -222,18 +238,16 @@ const CreateBlog: React.FunctionComponent = ({ title = '', slug = '', content = 
             console.log('published', response?.data.data.isPublished);
             console.log(`Blog ${response?.data.data.isPublished ? 'published' : 'unpublished'} successfully`, response);
             console.log("id: ", id)
-
             toast({
                 title: `Blog ${response?.data.data.isPublished ? 'published' : 'unpublished'} successfully`,
             });
-
         }
-        catch (err) {
+        catch (err: unknown) {
             console.log(err);
             toast({
                 variant: "destructive",
                 title: "Error publishing blog",
-                description: err?.message,
+                description: err instanceof Error ? err.message : 'Error on toggling the publish blog',
             });
         }
     }
