@@ -1,6 +1,6 @@
 'use client';
 
-export const Footer = () => {
+export const Footer:React.FC = () => {
     return (
         <footer className=" pb-10">
             <div className=" mt-8 pt-4 text-center">

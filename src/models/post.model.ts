@@ -1,39 +1,39 @@
 
-import mongoose, {Schema,Document} from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface Post extends Document {
-  title: string;
-  content: string;
-  slug: string;
-  isPublished: boolean;
-  author:Schema.Types.ObjectId;
+    title: string;
+    content: string;
+    slug: string;
+    isPublished: boolean;
+    author: Schema.Types.ObjectId;
 }
 
 
-const PostSchema:Schema<Post> = new Schema({
-    title:{
+const PostSchema: Schema<Post> = new Schema({
+    title: {
         type: String,
         required: true,
         minlength: 6,
         trim: true,
     },
 
-    content:{
+    content: {
         type: String,
         required: true,
         minlength: 20,
     },
 
-    slug:{
+    slug: {
         type: String,
         required: true,
         unique: true,
     },
-    isPublished:{
+    isPublished: {
         type: Boolean,
         default: false,
     },
-    author:{
+    author: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true,
@@ -41,6 +41,6 @@ const PostSchema:Schema<Post> = new Schema({
 });
 
 const PostModel = (mongoose.models.Post as mongoose.Model<Post>) ||
-                    mongoose.model<Post>('Post', PostSchema);
+    mongoose.model<Post>('Post', PostSchema);
 
 export default PostModel;

@@ -9,14 +9,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 
 
-export const Navbar = () => {
+export const Navbar:React.FC = () => {
 
     const session = useSession()
     const { toast } = useToast();
     
     console.log("session", session)
 
-    const handleLogout = async () => {
+    const handleLogout = async ():Promise<void> => {
         try {
             await signOut({
                 redirect: false
@@ -24,12 +24,12 @@ export const Navbar = () => {
             toast({
                 title: "Logged out successfully",
             });
-        } catch (error) {
+        } catch (error:unknown) {
             console.log("error: " + error);
             toast({
                 title: "Failed to logout",
                 variant: 'destructive',
-                description: error?.message,
+                description: error instanceof Error? error.message:'',
             });
         }
     }

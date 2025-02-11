@@ -21,26 +21,34 @@ import {
 
 import { useSelector} from 'react-redux'
 import { useToast } from '@/hooks/use-toast'
+import { RootState } from '../store/store'
 
 
-const MenuBar = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
+interface IMenuBarProps{
+    onSave: (content: string) => Promise<void>
+    isUpdate: boolean
+    onUpdate: (content: string) => Promise<void>
+    onTogglePublish: (content:string) => Promise<void>
+}
+
+const MenuBar:React.FC<IMenuBarProps> = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
 
     const { editor } = useCurrentEditor()
-    const [color, setColor] = useState('#000000') // Default color
-    const [savingContent, setSavingContent] = useState(false)
-    const [publishingContent, setPublishingContent] = useState(false)
-    const [updatingContent, setUpdatingContent] = useState(false)
+    const [color, setColor] = useState<string>('#000000') // Default color
+    const [savingContent, setSavingContent] = useState<boolean>(false)
+    const [publishingContent, setPublishingContent] = useState<boolean>(false)
+    const [updatingContent, setUpdatingContent] = useState<boolean>(false)
     const {toast} = useToast()
-    const isPublished = useSelector(state => state.blogReducer.isPublished);
+    const isPublished = useSelector((state:RootState)=> state.blogReducer.isPublished);
 
     if (!editor) {
         return null
     }
 
     // Handler for color change
-    const handleColorChange = (selectedColor: { hex: React.SetStateAction<string> }) => {
+    const handleColorChange = (selectedColor: { hex: React.SetStateAction<string> }):void => {
         setColor(selectedColor.hex)
-        editor.chain().setColor(selectedColor.hex).run()
+        editor.chain().setColor(selectedColor.hex.toString()).run()
     }
 
     const handleSave: React.MouseEventHandler<HTMLButtonElement> | undefined = async () => {
@@ -54,7 +62,7 @@ const MenuBar = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
             return
         }
         console.log("getHTML(): ", editor.getHTML())
-        const formattedHTML = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
+        const formattedHTML:string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
 
         console.log("formatted: ", formattedHTML)
 
@@ -72,7 +80,7 @@ const MenuBar = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
             return
         }
         console.log("getHTML(): ", editor.getHTML())
-        const formattedHTML = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
+        const formattedHTML:string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
 
         console.log("formatted: ", formattedHTML)
 
@@ -91,7 +99,7 @@ const MenuBar = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
             return
         }
         console.log("getHTML(): ", editor.getHTML())
-        const formattedHTML = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
+        const formattedHTML:string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
 
         console.log("formatted: ", formattedHTML)
         await onTogglePublish(formattedHTML);
@@ -281,7 +289,7 @@ const MenuBar = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
 
 const extensions = [
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
-    TextStyle.configure({ types: [ListItem.name] }),
+    TextStyle.configure({ types: [ListItem.name] }), // TODO: this line is same as documentation but why it is given types error
     StarterKit.configure({
         bulletList: {
             keepMarks: true,
@@ -294,18 +302,24 @@ const extensions = [
     }),
 ]
 
-// const content = `
-//   Write What is in Your mind
-// `
 
-const RichTextEditor = ({ onSave, content, isUpdate, onUpdate, isPublished, onTogglePublish }) => {
+interface IRichTextEditorProps{
+    onSave: (content: string) => Promise<void>
+    isUpdate: boolean
+    onUpdate: (content: string) => Promise<void>
+    onTogglePublish: (content:string) => Promise<void>
+    content: string;
+    isPublished: boolean;
+}
+
+const RichTextEditor:React.FC<IRichTextEditorProps> = ({ onSave, content, isUpdate, onUpdate, isPublished, onTogglePublish }) => {
     return (
 
         <EditorProvider slotBefore={<MenuBar
             onSave={onSave}
             isUpdate={isUpdate}
             onUpdate={onUpdate}
-            isPublished={isPublished}
+            // isPublished={isPublished}
             onTogglePublish={onTogglePublish}
         />} extensions={extensions} content={content}></EditorProvider>
     )

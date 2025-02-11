@@ -7,8 +7,8 @@ export async function POST(request: Request) {
     await dbConnect();
 
     try {
-        const { username, code } = await request.json();
-        const decodedUsername = decodeURIComponent(username);
+        const { username, code }:{ username:string, code:string } = await request.json();
+        const decodedUsername:string = decodeURIComponent(username);
         const user = await UserModel.findOne({ username: decodedUsername });
 
         if (!user) {
@@ -21,8 +21,8 @@ export async function POST(request: Request) {
         }
 
         // Check if the code is correct and not expired
-        const isCodeValid = user.emailVerificationCode === code;
-        const isCodeNotExpired = new Date(user.emailVerificationCodeExpiry) > new Date();
+        const isCodeValid:boolean = user.emailVerificationCode === code;
+        const isCodeNotExpired:boolean = new Date(user.emailVerificationCodeExpiry) > new Date();
 
         if (isCodeValid && isCodeNotExpired) {
             // Update the user's verification status
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
             return Response.json(response,{status:400});
 
         }
-    } catch (error) {
+    } catch (error:unknown) {
         console.error('Error verifying user:', error);
         const response: ApiResponse = {
             status: 500,

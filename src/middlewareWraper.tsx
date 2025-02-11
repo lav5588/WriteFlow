@@ -4,7 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 
-const WithAuth = ({ children }) => {
+const WithAuth:React.FC<{children:React.ReactNode}> = ({ children }) => {
     const session = useSession();
     const router = useRouter();
     const pathname = usePathname();

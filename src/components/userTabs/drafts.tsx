@@ -10,6 +10,7 @@ import { EllipsisVertical, GalleryThumbnails, Loader2, Pencil, Rss, Trash2, Undo
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog"
 import { useToast } from "@/hooks/use-toast"
 import { deleteDraft, publishDraft } from "@/network-call/userProfile.networkCall"
+import { IBlog } from "@/types/blog"
 
 const truncateHTML = (html: string, maxLength: number) => {
     const tempDiv = document.createElement("div");
@@ -18,35 +19,40 @@ const truncateHTML = (html: string, maxLength: number) => {
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 
-const Drafts = ({ draftData, fetchPublishedAndUnpublishedData }) => {
+interface IDraftComponentProps{
+    draftData:IBlog[];
+    fetchPublishedAndUnpublishedData: () => Promise<void>;
+}
+
+const Drafts:React.FC<IDraftComponentProps> = ({ draftData, fetchPublishedAndUnpublishedData }) => {
     const router = useRouter();
-    const [isPublishing, setIsPublishing] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const [isPublishing, setIsPublishing] = useState<boolean>(false);
+    const [isDeleting, setIsDeleting] = useState<boolean>(false);
     
 
     if (draftData.length == 0) {
         return <div>There is no drafts</div>
     }
 
-    const handleClick = (slug) => {
+    const handleClick = (slug:string) => {
         router.push(`/draft/${slug}`)
     };
 
-    const handleDelete = async (slug) => {
+    const handleDelete = async (slug:string) => {
         await deleteDraft(slug,setIsDeleting);
         fetchPublishedAndUnpublishedData();
     }
 
-    const handleEdit = (slug) => {
+    const handleEdit = (slug:string) => {
         router.push(`/draft/${slug}`)
     };
 
-    const handlePublish = async (id) => {
+    const handlePublish = async (id:string) => {
         await publishDraft(id,setIsPublishing);
         fetchPublishedAndUnpublishedData();
     }
 
-    const handlePreview = (slug) => {
+    const handlePreview = (slug:string) => {
         router.push(`/blogs/${slug}`)
     };
 

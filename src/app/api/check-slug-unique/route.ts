@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
-import PostModel from "@/models/post.model";
+import PostModel, { Post } from "@/models/post.model";
 import { ApiResponse } from '@/types/ApiResponse'
 
 export async function GET(request: Request) {
@@ -9,7 +9,10 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const slug = searchParams.get('slug');
         const id = searchParams.get('id');
-        const result = await PostModel.findOne({ slug });
+        if(!slug?.trim()) {
+            return Response.json({  message:"missing parameter slug" },{ status:400});
+        }
+        const result:Post | null = await PostModel.findOne({ slug });
         if (result && result._id != id) {
             const response: ApiResponse = {
                 status: 400,
@@ -27,7 +30,7 @@ export async function GET(request: Request) {
 
         return Response.json(response, { status: 200});
 
-    }catch (err) {
+    }catch (err:unknown) {
         console.error('Error fetching post:', err);
         const response: ApiResponse = {
             status: 500,

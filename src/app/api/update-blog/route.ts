@@ -1,7 +1,8 @@
 import { auth } from "@/auth";
 import dbConnect from "@/lib/dbConnect";
-import PostModel from "@/models/post.model";
+import PostModel, { Post } from "@/models/post.model";
 import { ApiResponse } from "@/types/ApiResponse";
+import { ISessionUser } from "@/types/user";
 import mongoose from "mongoose";
 
 export async function POST(request: Request) {
@@ -10,7 +11,7 @@ export async function POST(request: Request) {
     try {
         const session = await auth();
 
-        if (!session) {
+        if (!session || !session.user || !session.user._id) {
             const response: ApiResponse = {
                 status: 401,
                 success: false,
@@ -19,10 +20,10 @@ export async function POST(request: Request) {
             return Response.json(response, { status: 401 });
         }
 
-        const user = session.user;
-        const { title, content, isPublished, slug, id } = await request.json();
+        const user:ISessionUser = session.user;
+        const { title, content, isPublished, slug, id }:{ title:string, content:string, isPublished:boolean, slug:string, id:string } = await request.json();
 
-        if (!title || !content || !slug) {
+        if (!title.trim() || !content.trim() || !slug.trim()) {
             const response: ApiResponse = {
                 status: 400,
                 success: false,
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
 
         console.log("Finding blog post...");
         // Use `findOne` to get a single document
-        const post = await PostModel.findOne({
+        const post:Post | null = await PostModel.findOne({
             _id: new mongoose.Types.ObjectId(id),
             author: new mongoose.Types.ObjectId(user._id),
         });
@@ -69,7 +70,7 @@ export async function POST(request: Request) {
             status: 500,
             success: false,
             message: "Error updating post",
-            error: error?.message,
+            error: error instanceof Error?error.message:'',
         };
         return Response.json(response, { status: 500 });
     }

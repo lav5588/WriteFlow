@@ -1,4 +1,4 @@
-import mongoose, {Schema,Document} from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
 
 export interface User extends Document {
@@ -7,35 +7,35 @@ export interface User extends Document {
   email: string;
   password: string;
   bio: string;
-  role:'ADMIN' | 'USER';
+  role: 'ADMIN' | 'USER';
   isVerified: boolean;
   profileImage?: string;
-  emailVerificationCode:string;
-  emailVerificationCodeExpiry:Date;
-  resetAndForgotPasswordToken:string;
-  resetAndForgotPasswordTokenExpiry:Date;
+  emailVerificationCode: string;
+  emailVerificationCodeExpiry: Date;
+  resetAndForgotPasswordToken: string;
+  resetAndForgotPasswordTokenExpiry: Date;
 }
 
 
-const UserSchema:Schema<User> = new Schema({
-  username:{
+const UserSchema: Schema<User> = new Schema({
+  username: {
     type: String,
-    required: [true,"username is required field"],
+    required: [true, "username is required field"],
     unique: true,
-    minlength: [3,"username must be at least 3 characters"],
-    maxlength: [20,"username must be at most 20 characters"],
+    minlength: [3, "username must be at least 3 characters"],
+    maxlength: [20, "username must be at most 20 characters"],
     trim: true,
   },
-  name:{
+  name: {
     default: 'N/A',
     type: String,
     trim: true,
-    minlength: [3,"name must be at least 3 characters"],
-    maxlength: [50,"name must be at most 50 characters"],
+    minlength: [3, "name must be at least 3 characters"],
+    maxlength: [50, "name must be at most 50 characters"],
   },
-  email:{
+  email: {
     type: String,
-    required: [true,"email is required field"],
+    required: [true, "email is required field"],
     unique: true,
     lowercase: true,
     validate: {
@@ -45,51 +45,51 @@ const UserSchema:Schema<User> = new Schema({
     },
   },
 
-  password:{
+  password: {
     type: String,
-    required: [true,"password is required field"],
-    minlength: [6,"password must be at least 6 characters"],
+    required: [true, "password is required field"],
+    minlength: [6, "password must be at least 6 characters"],
   },
 
-  role:{
+  role: {
     type: String,
     enum: ['ADMIN', 'USER'],
     default: 'USER',
   },
 
-  bio:{
+  bio: {
     type: String,
     default: 'update your bio',
-    maxlength: [500,"bio must be at most 500 characters"],
+    maxlength: [500, "bio must be at most 500 characters"],
     trim: true,
   },
-  
-  isVerified:{
+
+  isVerified: {
     type: Boolean,
     default: false,
   },
 
-  profileImage:{
+  profileImage: {
     type: String,
     default: '',
   },
 
-  emailVerificationCode:{
+  emailVerificationCode: {
     type: String,
     default: '',
   },
 
-  emailVerificationCodeExpiry:{
+  emailVerificationCodeExpiry: {
     type: Date,
     default: null,
   },
 
-  resetAndForgotPasswordToken:{
+  resetAndForgotPasswordToken: {
     type: String,
     default: '',
   },
 
-  resetAndForgotPasswordTokenExpiry:{
+  resetAndForgotPasswordTokenExpiry: {
     type: Date,
     default: null,
   },
@@ -99,7 +99,7 @@ const UserSchema:Schema<User> = new Schema({
 
 
 const UserModel = (mongoose.models.User as mongoose.Model<User>) ||
-                    mongoose.model<User>('User', UserSchema);
+  mongoose.model<User>('User', UserSchema);
 
 export default UserModel;
 

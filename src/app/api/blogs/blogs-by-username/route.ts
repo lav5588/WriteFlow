@@ -1,6 +1,6 @@
 import dbConnect from "@/lib/dbConnect";
-import PostModel from "@/models/post.model";
-import UserModel from "@/models/user.model";
+import PostModel, { Post } from "@/models/post.model";
+import UserModel, { User } from "@/models/user.model";
 
 
 export async function GET(request: Request) {
@@ -11,17 +11,17 @@ export async function GET(request: Request) {
         if(!username){
             return Response.json({  message:"missing parameter username" },{ status:400});
         }
-        const user = await UserModel.findOne({ username: username});
+        const user:User | null = await UserModel.findOne({ username: username});
         if(!user){
             return Response.json({  message:"User not found" },{ status:404});
         }
-        const post = await PostModel.find({ isPublished:true ,author:user._id});
+        const post:Post[] = await PostModel.find({ isPublished:true ,author:user._id});
         if(!post){
             return Response.json({  message:"Post not found" },{ status:404});
         }
         return Response.json({  post, status:200, message:"Post fetched successfully"},{ status:200});
-    } catch (error) {
+    } catch (error:unknown) {
         console.error("Error fetching post: ", error);
-        return Response.json({  message:"Error fetching post", error: error?.message },{ status:500});
+        return Response.json({  message:"Error fetching post", error: error instanceof Error? error.message:'' },{ status:500});
     }
 }

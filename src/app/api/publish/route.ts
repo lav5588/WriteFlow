@@ -1,7 +1,9 @@
 import { auth } from "@/auth";
 import dbConnect from "@/lib/dbConnect";
-import PostModel from "@/models/post.model";
+import PostModel, { Post } from "@/models/post.model";
 import { ApiResponse } from "@/types/ApiResponse";
+import { ISessionUser } from "@/types/user";
+
 
 
 
@@ -13,7 +15,7 @@ export async function GET(request: Request) {
     try {
         const session = await auth();
 
-        if (!session) {
+        if (!session || !session.user || !session.user._id) {
             const response: ApiResponse = {
                 status: 401,
                 success: false,
@@ -21,7 +23,7 @@ export async function GET(request: Request) {
             }
             return Response.json(response, { status: 401 });
         }
-        const user = session.user;
+        const user:ISessionUser = session.user;
         
         const url = new URL(request.url);
         const id = url.searchParams.get("id");
@@ -35,7 +37,7 @@ export async function GET(request: Request) {
             return Response.json(response, { status: 400 });
         }
 
-        const post = await PostModel.findById(id);
+        const post:Post| null = await PostModel.findById(id);
         if(!post){
             const response: ApiResponse = {
                 status: 404,
@@ -43,6 +45,14 @@ export async function GET(request: Request) {
                 message: "Post not found",
             }
             return Response.json(response, { status: 404 });
+        }
+        if(post.author.toString() !== user._id.toString()){
+            const response: ApiResponse = {
+                status: 403,
+                success: false,
+                message: "Unauthorized to publish post",
+            }
+            return Response.json(response, { status: 403 });
         }
         post.isPublished = !post.isPublished;
         await post.save();
@@ -56,13 +66,13 @@ export async function GET(request: Request) {
         return Response.json(response, { status: 200 });
 
         
-    } catch (error) {
+    } catch (error:unknown) {
         console.log(error);
         const response: ApiResponse = {
             status: 500,
             success: false,
             message: "Error publishing post",
-            error: error?.message,
+            error: error instanceof Error ?error.message:'',
         }
         return Response.json(response, { status: 500 });
     }

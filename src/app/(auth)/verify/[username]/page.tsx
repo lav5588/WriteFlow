@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 
-const page = () => {
+const page:React.FC = () => {
 
     const params = useParams();
     const router = useRouter()
@@ -25,7 +25,7 @@ const page = () => {
             verifyCode: '',
         }
     });
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const onSubmit = async (values: z.infer<typeof veryfyCodeSchema>) => {
         const data = { username: params.username, code: values.verifyCode }
@@ -35,11 +35,11 @@ const page = () => {
             const response = await axios.post('/api/verify-code', data);
             console.log(response);
             router.push('/sign-in')
-        } catch (error) {
+        } catch (error:unknown) {
             console.log("user verification error", error);
             toast({
                 title: 'User verification failed',
-                description: error?.message,
+                description: error instanceof Error ?error.message :'',
                 variant: 'destructive'
             })
         }

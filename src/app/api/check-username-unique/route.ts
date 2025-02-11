@@ -1,5 +1,5 @@
 import dbConnect from '@/lib/dbConnect';
-import UserModel from '@/models/user.model';
+import UserModel, { User } from '@/models/user.model';
 import { z } from 'zod';
 import { ApiResponse } from '@/types/ApiResponse';
 import { auth } from '@/auth';
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
             return Response.json(response);
         }
 
-        const existingVerifiedUser = await UserModel.findOne({
+        const existingVerifiedUser:User | null = await UserModel.findOne({
             username,
             isVerified: true,
         });
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
         }
         return Response.json(response);
 
-    } catch (error) {
+    } catch (error:unknown) {
         console.error('Error checking username:', error);
         const response: ApiResponse = {
             status: 500,

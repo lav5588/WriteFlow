@@ -3,7 +3,7 @@ import { toast } from "@/hooks/use-toast";
 import axios from "axios";
 
 
-export async function fetchUserDataByUserName(username) {
+export async function fetchUserDataByUserName(username:string) {
     try {
         const response = await axios.get(`/api/u/${username}`);
         if (!response) {
@@ -15,12 +15,12 @@ export async function fetchUserDataByUserName(username) {
             return;
         }
         return response.data;
-    } catch (error) {
+    } catch (error:unknown) {
         console.log("Error in fetching user data: ", error);
         toast({
             variant: "destructive",
             title: "Error fetching user data",
-            description: error?.message,
+            description: error instanceof Error ? error.message :"",
         })
 
     }
@@ -31,17 +31,17 @@ export async function fetchDraftData() {
     try {
         const response = await axios.get('/api/drafts');
         return response.data;
-    } catch (error) {
+    } catch (error:unknown) {
         toast({
             title: "Failed to fetch drafts",
             variant: 'destructive',
-            description: error?.message,
+            description: error instanceof Error ? error.message :"",
         });
         console.log("Error in fetching data: ", error);
     }
 }
 
-export async function deleteDraft(slug,setIsDeleting) {
+export async function deleteDraft(slug:string,setIsDeleting:(val:boolean)=>void) {
 
     try {
         setIsDeleting(true);
@@ -58,11 +58,11 @@ export async function deleteDraft(slug,setIsDeleting) {
         });
         return response.data;
     }
-    catch (error) {
+    catch (error:unknown) {
         toast({
             title: "Failed to delete blog",
             variant: 'destructive',
-            description: error?.message,
+            description: error instanceof Error ? error.message :"",
         });
         console.log("Error in deleting data: ", error);
     }
@@ -71,7 +71,7 @@ export async function deleteDraft(slug,setIsDeleting) {
     }
 }
 
-export async function publishDraft(id,setIsPublishing) {
+export async function publishDraft(id:string,setIsPublishing:(val:boolean)=>void) {
 
     try {
         if (!id) {
@@ -95,35 +95,35 @@ export async function publishDraft(id,setIsPublishing) {
             title: "Blog Published successfully",
         });
     }
-    catch (err) {
+    catch (error:unknown) {
         toast({
             title: "Failed to publish blog",
             variant: 'destructive',
-            description: err?.message,
+            description: error instanceof Error ? error.message :"",
         });
-        console.log(err);
+        console.log(error);
     }
     finally{
         setIsPublishing(false);
     }
 }
 
-export async function fetchPublishedData(username) {
+export async function fetchPublishedData(username:string) {
     console.log('hello from publish');
     try {
         const response = await axios.get(`/api/blogs/blogs-by-username?username=${username}`);;
         return response.data.post;
-    } catch (error) {
+    } catch (error:unknown) {
         console.log("Error in fetching data: ", error);
         toast({
             title: "Failed to fetch published blogs",
             variant: 'destructive',
-            description: error?.message,
+            description: error instanceof Error ? error.message :"",
         });
     }
 }
 
-export async function deletePublishedBlog(slug,setIsDeleting) {
+export async function deletePublishedBlog(slug:string,setIsDeleting:(val:boolean)=>void) {
 
     try {
         setIsDeleting(true);
@@ -140,12 +140,12 @@ export async function deletePublishedBlog(slug,setIsDeleting) {
             title: "Blog deleted successfully",
         });
     }
-    catch (error) {
+    catch (error:unknown) {
         console.log("Error in deleting data: ", error);
         toast({
             title: "Failed to delete blog",
             variant: 'destructive',
-            description: error?.message,
+            description: error instanceof Error ? error.message :"",
         });
     }
     finally{
@@ -153,7 +153,7 @@ export async function deletePublishedBlog(slug,setIsDeleting) {
     }
 }
 
-export async function unPublishThePublishedBlog(id,setIsUnPublishing) {
+export async function unPublishThePublishedBlog(id:string,setIsUnPublishing:(val:boolean)=>void) {
 
     try {
         // console.log("hello");
@@ -180,12 +180,12 @@ export async function unPublishThePublishedBlog(id,setIsUnPublishing) {
         });
         console.log('Blog Unpublished successfully', response);
     }
-    catch (err) {
-        console.log(err);
+    catch (error:unknown) {
+        console.log(error);
         toast({
             title: "Failed to unpublish blog",
             variant: 'destructive',
-            description: err?.message,
+            description: error instanceof Error ? error.message :"",
         });
     }
     finally{

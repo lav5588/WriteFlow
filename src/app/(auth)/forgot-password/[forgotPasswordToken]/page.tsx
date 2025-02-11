@@ -37,8 +37,8 @@ const ForgotPasswordPage: React.FC = () => {
             confirmPassword: "",
         },
     })
-    const [viewPassword, setViewPassword] = useState(false);
-    const [isSubmitting,setIsSubmitting] = useState(false);
+    const [viewPassword, setViewPassword] = useState<boolean>(false);
+    const [isSubmitting,setIsSubmitting] = useState<boolean>(false);
 
     async function onSubmit(values: z.infer<typeof emailSchema>) {
         if (values.newPassword !== values.confirmPassword) {
@@ -60,12 +60,12 @@ const ForgotPasswordPage: React.FC = () => {
             });
             router.push('/sign-in');
 
-        } catch (error) {
+        } catch (error:unknown) {
             console.error(error);
             toast({
                 variant: 'destructive',
                 title: 'Invalid link',
-                description: error?.message,
+                description:error instanceof Error? error.message:'Error occured while forgetting the password',
             })
         }
         finally {

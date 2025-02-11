@@ -20,22 +20,22 @@ import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
 
 
-const emailSchema = z.object({
+const identifierSchema = z.object({
     identifier: z.string(),
 })
 
 const ForgotPasswordPage: React.FC = () => {
     const {toast} = useToast();
-    const [isEmailSent,setIsEmailSent] = useState(false);
-    const [isSubmitting,setIsSubmitting] = useState(false);
-    const form = useForm<z.infer<typeof emailSchema>>({
-        resolver: zodResolver(emailSchema),
+    const [isEmailSent,setIsEmailSent] = useState<boolean>(false);
+    const [isSubmitting,setIsSubmitting] = useState<boolean>(false);
+    const form = useForm<z.infer<typeof identifierSchema>>({
+        resolver: zodResolver(identifierSchema),
         defaultValues: {
             identifier: "",
         },
     })
 
-    async function onSubmit(values: z.infer<typeof emailSchema>) {
+    async function onSubmit(values: z.infer<typeof identifierSchema>) {
         
         console.log(values);
         try {
@@ -57,6 +57,7 @@ const ForgotPasswordPage: React.FC = () => {
             toast({
                 variant:'destructive',
                 title:'Error in sending email'  ,
+                description: error instanceof Error? error.message:''
             })
             
         }

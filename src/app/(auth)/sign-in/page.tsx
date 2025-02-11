@@ -17,7 +17,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 
-const page = () => {
+const page:React.FC = () => {
     const router = useRouter();
     const form = useForm<z.infer<typeof signInSchema>>({
         resolver: zodResolver(signInSchema),
@@ -27,8 +27,8 @@ const page = () => {
         }
     });
     const { toast } = useToast();
-    const [viewPassword, setViewPassword] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [viewPassword, setViewPassword] = useState<boolean>(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
 
     const onSubmit = async (values: z.infer<typeof signInSchema>) => {
@@ -53,12 +53,12 @@ const page = () => {
             router.push('/');
 
         }
-        catch (error) {
+        catch (error:unknown) {
             console.error("sign in error", error);
             toast({
                 variant: "destructive",
                 title: "Error signing in",
-                description: error?.message,
+                description: error instanceof Error ? error.message: '',
             })
         }
         finally{
@@ -90,7 +90,7 @@ const page = () => {
                             <FormItem>
                                 <FormControl>
                                     <div className="relative">
-                                        <Input placeholder="password" {...field} type="password" type={viewPassword ? 'text' : 'password'} className="pr-10" />
+                                        <Input placeholder="password" {...field} type={viewPassword ? 'text' : 'password'} className="pr-10" />
                                         {!viewPassword && <Eye className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={() => setViewPassword(!viewPassword)} />}
                                         {viewPassword && <EyeOff className="absolute top-1 right-1 opacity-50 cursor-pointer" onClick={() => setViewPassword(!viewPassword)} />}
                                     </div>

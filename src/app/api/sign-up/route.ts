@@ -1,5 +1,5 @@
 import dbConnect from '@/lib/dbConnect';
-import UserModel from '@/models/user.model';
+import UserModel, { User } from '@/models/user.model';
 import bcrypt from 'bcryptjs';
 import { sendVerificationEmail } from '@/lib/sendVerificationEmail';
 import { ApiResponse } from '@/types/ApiResponse';
@@ -8,8 +8,8 @@ export async function POST(request: Request) {
   await dbConnect();
   console.log("Hi");
   try {
-    const { username, email, password } = await request.json();
-    if (!username || !email || !password) {
+    const { username, email, password }:{ username:string, email:string, password:string } = await request.json();
+    if (!username.trim() || !email.trim() || !password.trim()) {
       const response: ApiResponse = {
         status: 400,
         success: false,
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       return Response.json(response,{status: 200});
     }
 
-    const existingVerifiedUserByUsername = await UserModel.findOne({
+    const existingVerifiedUserByUsername:User | null = await UserModel.findOne({
       username,
       isVerified: true,
     });
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     }
 
 
-    const existingUserByEmail = await UserModel.findOne({ email });
+    const existingUserByEmail:User | null = await UserModel.findOne({ email });
     let verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     if (existingUserByEmail) {
@@ -52,11 +52,11 @@ export async function POST(request: Request) {
         await existingUserByEmail.save();
       }
     } else {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const expiryDate = new Date();
+      const hashedPassword:string = await bcrypt.hash(password, 10);
+      const expiryDate: Date = new Date();
       expiryDate.setHours(expiryDate.getHours() + 1);
 
-      const newUser = new UserModel({
+      const newUser:User = new UserModel({
         username,
         email,
         password: hashedPassword,

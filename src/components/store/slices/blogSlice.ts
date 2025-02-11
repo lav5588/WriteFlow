@@ -1,6 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-const initialState = {
+interface IState{
+    isPublished: boolean,
+    id: number | null,
+}
+
+const initialState:IState = {
     isPublished: false,
     id:null,
 }

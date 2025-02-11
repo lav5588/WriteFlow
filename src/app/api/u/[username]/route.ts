@@ -1,20 +1,20 @@
 // src/app/api/u/[username]/route.ts
 
 import dbConnect from '@/lib/dbConnect';
-import UserModel from '@/models/user.model';
+import UserModel, { User } from '@/models/user.model';
 import { NextResponse } from 'next/server';
 
 
 export async function GET(req: Request, {params}: { params: Promise<{ username: string ;}> }) {
     await dbConnect();
     try {
-        const username = (await params).username;
+        const username:string = (await params).username;
 
-        if (!username) {
+        if (!username.trim()) {
             return NextResponse.json({ messsage: "username is required" }, { status: 400 });
         }
 
-        const user = await UserModel.findOne({ username: username})
+        const user:User | null = await UserModel.findOne({ username: username})
         if(!user) {
             return NextResponse.json({ message: `${username} not found` }, { status: 404 });
         }

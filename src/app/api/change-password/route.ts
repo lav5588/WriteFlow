@@ -1,9 +1,7 @@
 import { auth } from "@/auth";
 import dbConnect from "@/lib/dbConnect";
-import PostModel from "@/models/post.model";
-import UserModel from "@/models/user.model";
+import UserModel, { User } from "@/models/user.model";
 import { ApiResponse } from "@/types/ApiResponse";
-import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
 
@@ -20,17 +18,25 @@ export async function POST(request: Request) {
             }
             return Response.json(response, { status: 401 });
         }
-        const username = session.user.username;
-        const { oldPassword, newPassword, confirmNewPassword } = await request.json();
+        const username:string = session.user.username;
+        const { oldPassword, newPassword, confirmNewPassword }:{ oldPassword:string, newPassword:string, confirmNewPassword:string } = await request.json();
         if(!oldPassword || !newPassword || !confirmNewPassword || newPassword !== confirmNewPassword) {
             const response: ApiResponse = {
                 status: 400,
                 success: false,
-                message: "All fields are required",
+                message: "All fields are required, newPassword and oldPassword should be the same",
             }
             return Response.json(response, { status: 400 });
         }  
-        const user = await UserModel.findOne({ username });
+        const user:User | null = await UserModel.findOne({ username });
+        if(!user){
+            const response: ApiResponse = {
+                status: 404,
+                success: false,
+                message: "User not found",
+            }
+            return Response.json(response, { status: 404 });
+        }
         const isOldPasswordCorrect = await bcrypt.compare(oldPassword, user.password);
         if(!isOldPasswordCorrect) {
             const response: ApiResponse = {
@@ -50,13 +56,13 @@ export async function POST(request: Request) {
         }
         return Response.json(response, { status: 200 });
         
-    } catch (error) {
+    } catch (error:unknown) {
         console.log(error);
         const response: ApiResponse = {
             status: 500,
             success: false,
             message: "Error in changing  password",
-            error: error?.message,
+            error: error instanceof Error?error.message:'',
         }
         return Response.json(response, { status: 500 });
     }

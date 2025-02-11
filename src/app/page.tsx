@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 
-const Hero = () => (
+const Hero:React.FC = () => (
   <section className="space-y-16 py-20">
     {/* Hero Section */}
     <div className="flex flex-col items-center justify-center text-center py-20 ">

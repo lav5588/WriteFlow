@@ -27,32 +27,37 @@ import { signIn, useSession } from "next-auth/react";
 import { usernameValidation } from "@/schemas/signUpSchema";
 import { useRouter } from "next/navigation";
 import updateSessionData from "@/lib/updateSessionData";
+import { IUser } from "@/types/user";
 
 
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 const profileSchema = z.object({
     profileImage: z
-        .any()
+        // .any()
+        .custom<File | undefined>((file) => {
+            if (!file) return true;
+            return file instanceof File && ACCEPTED_IMAGE_TYPES.includes(file.type);
+        }, { message: "Invalid file type. Only JPEG, JPG, PNG, and WEBP are allowed." })
         .optional(),
     name: z.string().min(3).max(50),
     username: usernameValidation,
     bio: z.string().max(250),
 });
 
-export function UpdateProfile({ user, fetchUserData }) {
-    const [isOpen, setIsOpen] = useState(false);
+export function UpdateProfile({ user, fetchUserData }:{user:IUser, fetchUserData:()=>void}) {
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const { toast } = useToast();
-    const [profileImageLink, setProfileImageLink] = useState(user.profileImage);
-    const [prImage, setPrImage] = useState("");
-    const inputRef = useRef();
+    const [profileImageLink, setProfileImageLink] = useState<string | undefined>(user.profileImage);
+    const [prImage, setPrImage] = useState<string>("");
+    const inputRef = useRef<HTMLInputElement | null>(null);
     const router = useRouter();
     const session = useSession();
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const form = useForm<z.infer<typeof profileSchema>>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
-            profileImage: "",
+            profileImage: undefined,
             name: user.name,
             username: user.username,
             bio: user.bio,
@@ -71,7 +76,9 @@ export function UpdateProfile({ user, fetchUserData }) {
             console.log("Form submitted with values:", values);
             console.log("User: ", form.getValues());
             const formData = new FormData();
-            formData.append("profileImage", values.profileImage);
+            if(values.profileImage){
+                formData.append("profileImage", values?.profileImage);
+            }
             formData.append("name", values.name);
             formData.append("username", values.username);
             formData.append("bio", values.bio);
@@ -85,12 +92,12 @@ export function UpdateProfile({ user, fetchUserData }) {
             }
             await updateSessionData();
         }
-        catch (error) {
+        catch (error:unknown) {
             console.log("update profile error: ", error);
             toast({
                 title: "Failed to update profile",
                 variant: 'destructive',
-                description: error?.message,
+                description: error instanceof Error?error.message:'',
             });
         }
         finally {
@@ -102,7 +109,7 @@ export function UpdateProfile({ user, fetchUserData }) {
 
     }
 
-    const handleChange = (e) => {
+    const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const newImageUrl = URL.createObjectURL(e.target.files[0]);
             setProfileImageLink(newImageUrl);
@@ -113,7 +120,7 @@ export function UpdateProfile({ user, fetchUserData }) {
     };
 
     const handleClick = () => {
-        inputRef.current.click();
+        inputRef.current?.click();
     }
 
 

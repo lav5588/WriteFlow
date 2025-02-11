@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 
-const page = () => {
+const page:React.FC = () => {
     const router = useRouter();
     const form = useForm<z.infer<typeof signUpSchema>>({
         resolver: zodResolver(signUpSchema),
@@ -27,8 +27,8 @@ const page = () => {
         }
     });
     const { toast } = useToast();
-    const [viewPassword,setViewPassword] = useState(false);
-    const [isSubmitting,setIsSubmitting] = useState(false);
+    const [viewPassword,setViewPassword] = useState<boolean>(false);
+    const [isSubmitting,setIsSubmitting] = useState<boolean>(false);
 
     const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
         console.log(values);
@@ -45,11 +45,11 @@ const page = () => {
             console.log("response in signing up: ", response);
             router.push(`/verify/${values.username}`)
         }
-        catch (error) {
+        catch (error:unknown) {
             console.error(error);
             toast({
                 title: 'Error signing up user',
-                description: error?.message,
+                description: error instanceof Error ? error.message :'',
                 variant: 'destructive'
             })
         }

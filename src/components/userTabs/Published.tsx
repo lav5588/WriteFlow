@@ -8,6 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useSession } from "next-auth/react"
 import { deletePublishedBlog, unPublishThePublishedBlog } from "@/network-call/userProfile.networkCall"
 import { useState } from "react";
+import { IBlog } from "@/types/blog";
 
 
 const truncateHTML = (html: string, maxLength: number) => {
@@ -17,16 +18,20 @@ const truncateHTML = (html: string, maxLength: number) => {
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 
+interface IPublishedComponentProps{
+    username: string;
+    publishedData: IBlog[];
+    fetchPublishedAndUnpublishedData: () => Promise<void>;
+}
 
-
-const Published = ({ username, publishedData, fetchPublishedAndUnpublishedData }) => {
+const Published:React.FC<IPublishedComponentProps> = ({ username, publishedData, fetchPublishedAndUnpublishedData }) => {
     const router = useRouter();
     const session = useSession();
-    const [isUnPublishing, setIsUnPublishing] = useState(false)
-    const [isDeleting, setIsDeleting] = useState(false)
+    const [isUnPublishing, setIsUnPublishing] = useState<boolean>(false)
+    const [isDeleting, setIsDeleting] = useState<boolean>(false)
 
 
-    const handleDelete = async (slug) => {
+    const handleDelete = async (slug:string) => {
         await deletePublishedBlog(slug,setIsDeleting);
         fetchPublishedAndUnpublishedData();
     }
@@ -35,16 +40,16 @@ const Published = ({ username, publishedData, fetchPublishedAndUnpublishedData }
         return <div>There is no published content</div>
     }
 
-    const handleClick = (slug) => {
+    const handleClick = (slug:string) => {
         router.push(`/blogs/${slug}`)
     };
 
-    const handleEdit = (slug) => {
+    const handleEdit = (slug:string) => {
         router.push(`/draft/${slug}`)
     };
 
 
-    const handleUnpublish = async (id) => {
+    const handleUnpublish = async (id:string) => {
         await unPublishThePublishedBlog(id,setIsUnPublishing);
         fetchPublishedAndUnpublishedData();
     }
