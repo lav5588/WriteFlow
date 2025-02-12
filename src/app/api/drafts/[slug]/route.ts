@@ -16,7 +16,7 @@ export async function GET(req: Request, context: { params: { slug: string | null
             return NextResponse.json({ messsage: "slug is required" }, { status: 400 });
         }
         const session = await auth();
-        if (!session || session.user || !session.user._id) {
+        if (!session || !session.user || !session.user._id) {
             return NextResponse.json({ "message": "unauthorised user" }, { status: 400 })
         }
         const user:ISessionUser = session.user;

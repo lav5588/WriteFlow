@@ -72,7 +72,7 @@ const Page: React.FC = () => {
     <>
 
       <div className='flex justify-center items-center flex-col'>
-        <Card className='mb-5 md:max-w-[50%] md:min-w-[30rem] min-h-[25rem]'>
+        <Card className='mb-5 md:max-w-[50%] min-w-[20rem] md:min-w-[30rem] min-h-[25rem]'>
           {isProfileLoading ? (
             <div className="flex justify-center items-center">
               <Loader2 className="h-10 w-10 animate-spin" />

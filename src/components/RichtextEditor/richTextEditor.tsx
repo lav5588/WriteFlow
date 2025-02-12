@@ -6,7 +6,7 @@ import ListItem from '@tiptap/extension-list-item'
 import TextStyle from '@tiptap/extension-text-style'
 import { EditorProvider, useCurrentEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { ChromePicker } from 'react-color' // Importing the Chrome color picker
 import { Button } from '../ui/button'
 import {
@@ -18,38 +18,41 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-
-import { useSelector} from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useToast } from '@/hooks/use-toast'
 import { RootState } from '../store/store'
+import Image from '@tiptap/extension-image'
+import { IKUpload } from 'imagekitio-next'
 
 
-interface IMenuBarProps{
+interface IMenuBarProps {
     onSave: (content: string) => Promise<void>
     isUpdate: boolean
     onUpdate: (content: string) => Promise<void>
-    onTogglePublish: (content:string) => Promise<void>
+    onTogglePublish: (content: string) => Promise<void>
 }
 
-const MenuBar:React.FC<IMenuBarProps> = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
+const MenuBar: React.FC<IMenuBarProps> = ({ onSave, isUpdate, onUpdate, onTogglePublish }) => {
 
     const { editor } = useCurrentEditor()
     const [color, setColor] = useState<string>('#000000') // Default color
     const [savingContent, setSavingContent] = useState<boolean>(false)
     const [publishingContent, setPublishingContent] = useState<boolean>(false)
     const [updatingContent, setUpdatingContent] = useState<boolean>(false)
-    const {toast} = useToast()
-    const isPublished = useSelector((state:RootState)=> state.blogReducer.isPublished);
+    const { toast } = useToast()
+    const isPublished = useSelector((state: RootState) => state.blogReducer.isPublished);
+    const ikUploadRef = useRef();
 
     if (!editor) {
         return null
     }
 
     // Handler for color change
-    const handleColorChange = (selectedColor: { hex: React.SetStateAction<string> }):void => {
+    const handleColorChange = (selectedColor: { hex: React.SetStateAction<string> }): void => {
         setColor(selectedColor.hex)
         editor.chain().setColor(selectedColor.hex.toString()).run()
     }
+
 
     const handleSave: React.MouseEventHandler<HTMLButtonElement> | undefined = async () => {
         setSavingContent(true)
@@ -62,7 +65,7 @@ const MenuBar:React.FC<IMenuBarProps> = ({ onSave, isUpdate, onUpdate, onToggleP
             return
         }
         console.log("getHTML(): ", editor.getHTML())
-        const formattedHTML:string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
+        const formattedHTML: string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
 
         console.log("formatted: ", formattedHTML)
 
@@ -80,7 +83,7 @@ const MenuBar:React.FC<IMenuBarProps> = ({ onSave, isUpdate, onUpdate, onToggleP
             return
         }
         console.log("getHTML(): ", editor.getHTML())
-        const formattedHTML:string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
+        const formattedHTML: string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
 
         console.log("formatted: ", formattedHTML)
 
@@ -88,7 +91,7 @@ const MenuBar:React.FC<IMenuBarProps> = ({ onSave, isUpdate, onUpdate, onToggleP
         setUpdatingContent(false)
     }
     const handlePublish: React.MouseEventHandler<HTMLButtonElement> | undefined = async (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
         setPublishingContent(true)
         console.log("getText(): ", editor.getText())
         if (editor.getText().trim() === '') {
@@ -99,12 +102,34 @@ const MenuBar:React.FC<IMenuBarProps> = ({ onSave, isUpdate, onUpdate, onToggleP
             return
         }
         console.log("getHTML(): ", editor.getHTML())
-        const formattedHTML:string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
+        const formattedHTML: string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
 
         console.log("formatted: ", formattedHTML)
         await onTogglePublish(formattedHTML);
         setPublishingContent(false)
     }
+
+    const handleAddImage = () => {
+        // const url = window.prompt('URL')
+        // if (url) {
+        //     editor.chain().focus().setImage({ src: url }).run()
+        // }
+        if (!ikUploadRef.current) {
+            return;
+        }
+
+        ikUploadRef.current.click()
+    }
+
+
+    const onImageKitUploadError = (err) => {
+        console.log("Error", err);
+    };
+
+    const onImageKitUploadSuccess = (res) => {
+        console.log("Success", res);
+        editor.chain().focus().setImage({ src: res.url }).run()
+    };
 
 
     return (
@@ -234,6 +259,9 @@ const MenuBar:React.FC<IMenuBarProps> = ({ onSave, isUpdate, onUpdate, onToggleP
                         />
                     </PopoverContent>
                 </Popover>
+                <Button onClick={handleAddImage}>
+                    Image
+                </Button>
                 <Button
                     onClick={() => editor.chain().focus().undo().run()}
                     disabled={!editor.can().chain().focus().undo().run()}
@@ -283,6 +311,11 @@ const MenuBar:React.FC<IMenuBarProps> = ({ onSave, isUpdate, onUpdate, onToggleP
                     }
                 </Button>}
             </div>
+            <IKUpload
+                className='hidden'
+                fileName="test-upload.png" onError={onImageKitUploadError} onSuccess={onImageKitUploadSuccess}
+                ref={ikUploadRef}
+            />
         </div>
     )
 }
@@ -300,19 +333,23 @@ const extensions = [
             keepAttributes: false,
         },
     }),
+    Image.configure({
+        allowBase64: true,
+        inline: false,
+    })
 ]
 
 
-interface IRichTextEditorProps{
+interface IRichTextEditorProps {
     onSave: (content: string) => Promise<void>
     isUpdate: boolean
     onUpdate: (content: string) => Promise<void>
-    onTogglePublish: (content:string) => Promise<void>
+    onTogglePublish: (content: string) => Promise<void>
     content: string;
     isPublished: boolean;
 }
 
-const RichTextEditor:React.FC<IRichTextEditorProps> = ({ onSave, content, isUpdate, onUpdate, isPublished, onTogglePublish }) => {
+const RichTextEditor: React.FC<IRichTextEditorProps> = ({ onSave, content, isUpdate, onUpdate, isPublished, onTogglePublish }) => {
     return (
 
         <EditorProvider slotBefore={<MenuBar

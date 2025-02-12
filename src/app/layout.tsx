@@ -8,6 +8,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import WithAuth from "@/middlewareWraper";
 import { Toaster } from "@/components/ui/toaster";
+import ImageKitProviderWrapper from "@/components/ImageKitProviderWrapper";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -44,12 +45,13 @@ export default function RootLayout({
           <StoreProvider>
             <SessionProvider>
               <WithAuth>
-              <div className="min-h-[70vh] min-w-[400px]">
-              <Navbar />
-
-                {children}
-              </div>
-              <Footer />
+                <div className="min-h-[70vh] min-w-[400px]">
+                  <ImageKitProviderWrapper>
+                    <Navbar />
+                    {children}
+                  </ImageKitProviderWrapper>
+                </div>
+                <Footer />
               </WithAuth>
             </SessionProvider>
           </StoreProvider>
