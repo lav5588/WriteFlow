@@ -5,6 +5,8 @@ import { signOut, useSession } from "next-auth/react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useEffect } from "react";
+import updateSessionData from "@/lib/updateSessionData";
 
 
 
@@ -33,6 +35,10 @@ export const Navbar:React.FC = () => {
             });
         }
     }
+    useEffect(() => {
+        updateSessionData()
+    },[])
+
     return (
         <nav className="flex items-center justify-between px-6 pt-4 pb-2 mb-2 border-b ">
 

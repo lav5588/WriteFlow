@@ -11,13 +11,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast"
 import { deleteDraft, publishDraft } from "@/network-call/userProfile.networkCall"
 import { IBlog } from "@/types/blog"
+import { truncateHTML } from "@/app/(app)/blogs/page"
 
-const truncateHTML = (html: string, maxLength: number) => {
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
-    const text = tempDiv.innerText || tempDiv.textContent || "";
-    return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
-};
 
 interface IDraftComponentProps{
     draftData:IBlog[];
@@ -61,7 +56,7 @@ const Drafts:React.FC<IDraftComponentProps> = ({ draftData, fetchPublishedAndUnp
             <h1 className="text-center font-extrabold text-3xl mb-5">Drafts</h1>
             <div className="flex flex-wrap gap-5  justify-center items-center">
                 {draftData.map((blog) => (
-                    <Card key={blog._id} className="h-[20rem]  w-[20rem]" >
+                    <Card key={blog._id} className="h-[24rem]  w-[20rem]" >
                         <CardHeader className="flex flex-row justify-between place-items-start">
                             <CardTitle className="leading-6" onClick={() => { handlePreview(blog.slug) }}><h5>{blog.title.toUpperCase()}</h5></CardTitle>
                             <DropdownMenu>
@@ -96,7 +91,7 @@ const Drafts:React.FC<IDraftComponentProps> = ({ draftData, fetchPublishedAndUnp
                         </CardHeader>
                         <CardContent onClick={() => { handlePreview(blog.slug) }}>
                             <div
-                                dangerouslySetInnerHTML={{ __html: truncateHTML(blog.content, 200) }}
+                                dangerouslySetInnerHTML={{ __html: truncateHTML(blog.content, 100) }}
                             />
                         </CardContent>
                     </Card>

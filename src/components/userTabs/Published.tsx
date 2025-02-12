@@ -9,14 +9,8 @@ import { useSession } from "next-auth/react"
 import { deletePublishedBlog, unPublishThePublishedBlog } from "@/network-call/userProfile.networkCall"
 import { useState } from "react";
 import { IBlog } from "@/types/blog";
+import { truncateHTML } from "@/app/(app)/blogs/page";
 
-
-const truncateHTML = (html: string, maxLength: number) => {
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
-    const text = tempDiv.innerText || tempDiv.textContent || "";
-    return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
-};
 
 interface IPublishedComponentProps{
     username: string;
@@ -61,7 +55,7 @@ const Published:React.FC<IPublishedComponentProps> = ({ username, publishedData,
             <h1 className="text-center font-extrabold text-3xl mb-5">Published</h1>
             <div className="flex flex-wrap gap-5  justify-center items-center">
                 {publishedData && publishedData?.map((blog) => (
-                    <Card key={blog._id} className="h-[20rem]  w-[20rem]">
+                    <Card key={blog._id} className="h-[24rem]  w-[20rem]">
                         <CardHeader className="flex flex-row justify-between place-items-start">
                             <CardTitle className="leading-6" onClick={() => { handleClick(blog.slug) }}><h5>{blog.title.toUpperCase()}</h5></CardTitle>
                             {session?.data?.user?.username == username && <DropdownMenu>
@@ -96,7 +90,7 @@ const Published:React.FC<IPublishedComponentProps> = ({ username, publishedData,
                         </CardHeader>
                         <CardContent onClick={() => { handleClick(blog.slug) }}>
                             <div
-                                dangerouslySetInnerHTML={{ __html: truncateHTML(blog.content, 200) }}
+                                dangerouslySetInnerHTML={{ __html: truncateHTML(blog.content, 100) }}
                             />
                         </CardContent>
                     </Card>

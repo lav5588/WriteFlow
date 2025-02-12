@@ -10,11 +10,23 @@ import { useRouter } from "next/navigation"
 
 import { useEffect, useState } from "react"
 
-const truncateHTML = (html: string, maxLength: number):string => {
+export const truncateHTML = (html: string, maxLength: number): string => {
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = html;
+
+    // Extract first image
+    const firstImg = tempDiv.querySelector("img");
+    let imgTag = "";
+    if (firstImg) {
+        imgTag = `<img src="${firstImg.getAttribute("src")}" alt="${firstImg.getAttribute("alt") || ""}" style= 'border-radius:8px;height:11rem;margin:auto'>`;
+        imgTag += '<br>'
+    }
+
+    // Extract and truncate text
     const text = tempDiv.innerText || tempDiv.textContent || "";
-    return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+    const truncatedText = text.length > maxLength ? text.substring(0, imgTag == ""?3.5*maxLength:maxLength) + "..." : text;
+
+    return imgTag + truncatedText;
 };
 
 const Page:React.FC = () => {
@@ -62,14 +74,14 @@ const Page:React.FC = () => {
             <h1 className="text-center font-extrabold text-3xl mb-5">Blogs</h1>
             <div className="flex flex-wrap gap-2 md:gap-5  justify-center items-center">
                 {data.map((blog) => (
-                    <Card key={blog._id} className="h-[20rem]  w-[20rem]" >
+                    <Card key={blog._id} className="h-[26rem]  w-[20rem]" >
                         <CardHeader>
                             <CardTitle onClick={() => { handleClick(blog.slug) }} className="leading-6 cursor-pointer" ><h5>{blog.title.toUpperCase()}</h5></CardTitle>
                             <p className="text-right"><Link href={`/u/${blog.author.username}`}>~{blog.author.username}</Link></p>
                         </CardHeader>
                         <CardContent onClick={() => { handleClick(blog.slug) }} className="cursor-pointer">
                             <div
-                                dangerouslySetInnerHTML={{ __html: truncateHTML(blog.content, 200) }}
+                                dangerouslySetInnerHTML={{ __html: truncateHTML(blog.content, 100) }}
                             />
                         </CardContent>
                     </Card>

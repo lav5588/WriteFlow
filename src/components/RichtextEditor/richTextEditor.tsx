@@ -23,6 +23,8 @@ import { useToast } from '@/hooks/use-toast'
 import { RootState } from '../store/store'
 import Image from '@tiptap/extension-image'
 import { IKUpload } from 'imagekitio-next'
+import { AlertDialog, AlertDialogContent, AlertDialogTitle } from '../ui/alert-dialog'
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 
 interface IMenuBarProps {
@@ -41,7 +43,8 @@ const MenuBar: React.FC<IMenuBarProps> = ({ onSave, isUpdate, onUpdate, onToggle
     const [updatingContent, setUpdatingContent] = useState<boolean>(false)
     const { toast } = useToast()
     const isPublished = useSelector((state: RootState) => state.blogReducer.isPublished);
-    const ikUploadRef = useRef();
+    const ikUploadRef = useRef<HTMLInputElement | null>(null);
+    const [isImageUploading, setIsImageUploading] = useState<boolean>(false);
 
     if (!editor) {
         return null
@@ -56,79 +59,107 @@ const MenuBar: React.FC<IMenuBarProps> = ({ onSave, isUpdate, onUpdate, onToggle
 
     const handleSave: React.MouseEventHandler<HTMLButtonElement> | undefined = async () => {
         setSavingContent(true)
-        console.log("getText(): ", editor.getText())
-        if (editor.getText().trim() === '') {
-            console.log("Content is empty")
-            toast({
-                title: "Content is empty",
-            })
-            return
+        try {
+            console.log("getText(): ", editor.getText())
+            const htmlContent = editor.getHTML().trim();
+            const hasImages = /<img[^>]+src="([^">]+)"/.test(htmlContent);
+            if (editor.getText().trim() === '' && !hasImages) {
+                console.log("Content is empty")
+                toast({
+                    title: "Content is empty",
+                })
+                return
+            }
+            console.log("getHTML(): ", editor.getHTML())
+            const formattedHTML: string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
+
+            console.log("formatted: ", formattedHTML)
+
+            await onSave(formattedHTML);
+            setSavingContent(false)
+        } catch (error: unknown) {
+            console.log("Error: ", error)
         }
-        console.log("getHTML(): ", editor.getHTML())
-        const formattedHTML: string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
-
-        console.log("formatted: ", formattedHTML)
-
-        await onSave(formattedHTML);
-        setSavingContent(false)
+        finally {
+            setSavingContent(false);
+        }
     }
     const handleUpdate: React.MouseEventHandler<HTMLButtonElement> | undefined = async () => {
         setUpdatingContent(true)
-        console.log("getText(): ", editor.getText())
-        if (editor.getText().trim() === '') {
-            console.log("Content is empty")
-            toast({
-                title: "Content is empty",
-            })
-            return
+        try {
+            console.log("getText(): ", editor.getText())
+            const htmlContent = editor.getHTML().trim();
+            const hasImages = /<img[^>]+src="([^">]+)"/.test(htmlContent);
+            if (editor.getText().trim() === '' && !hasImages) {
+                console.log("Content is empty")
+                toast({
+                    title: "Content is empty",
+                })
+                return
+            }
+            console.log("getHTML(): ", editor.getHTML())
+            const formattedHTML: string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
+
+            console.log("formatted: ", formattedHTML)
+
+            await onUpdate(formattedHTML);
+            setUpdatingContent(false)
+        } catch (error: unknown) {
+            console.log("Error: ", error)
         }
-        console.log("getHTML(): ", editor.getHTML())
-        const formattedHTML: string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
-
-        console.log("formatted: ", formattedHTML)
-
-        await onUpdate(formattedHTML);
-        setUpdatingContent(false)
+        finally {
+            setUpdatingContent(false)
+        }
     }
     const handlePublish: React.MouseEventHandler<HTMLButtonElement> | undefined = async (e) => {
         e.preventDefault();
-        setPublishingContent(true)
-        console.log("getText(): ", editor.getText())
-        if (editor.getText().trim() === '') {
-            console.log("Content is empty")
-            toast({
-                title: "Content is empty",
-            })
-            return
-        }
-        console.log("getHTML(): ", editor.getHTML())
-        const formattedHTML: string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
+        try {
+            setPublishingContent(true)
+            console.log("getText(): ", editor.getText())
+            const htmlContent = editor.getHTML().trim();
+            const hasImages = /<img[^>]+src="([^">]+)"/.test(htmlContent);
+            if (editor.getText().trim() === '' && !hasImages) {
+                console.log("Content is empty")
+                toast({
+                    title: "Content is empty",
+                })
+                return
+            }
+            console.log("getHTML(): ", editor.getHTML())
+            const formattedHTML: string = editor.getHTML().replace(/ {2,}/g, match => match.replace(/ /g, '&nbsp;')).replace(/<p><\/p>/g, '<br>');
 
-        console.log("formatted: ", formattedHTML)
-        await onTogglePublish(formattedHTML);
-        setPublishingContent(false)
+            console.log("formatted: ", formattedHTML)
+            await onTogglePublish(formattedHTML);
+            setPublishingContent(false)
+        } catch (error: unknown) {
+            console.log("Error: ", error)
+        }
+        finally {
+            setPublishingContent(false)
+        }
     }
 
     const handleAddImage = () => {
-        // const url = window.prompt('URL')
-        // if (url) {
-        //     editor.chain().focus().setImage({ src: url }).run()
-        // }
         if (!ikUploadRef.current) {
             return;
         }
-
         ikUploadRef.current.click()
     }
 
 
-    const onImageKitUploadError = (err) => {
+    const onImageKitUploadError = (err: unknown) => {
         console.log("Error", err);
+        setIsImageUploading(false)
     };
 
-    const onImageKitUploadSuccess = (res) => {
-        console.log("Success", res);
+    const onImageKitUploadSuccess = (res: { url: string }) => {
+        console.log("Image uploaded successfully: ", res);
         editor.chain().focus().setImage({ src: res.url }).run()
+        setIsImageUploading(false)
+    }
+
+    const onImageKitUploadStart = () => {
+        setIsImageUploading(true)
     };
 
 
@@ -313,9 +344,20 @@ const MenuBar: React.FC<IMenuBarProps> = ({ onSave, isUpdate, onUpdate, onToggle
             </div>
             <IKUpload
                 className='hidden'
-                fileName="test-upload.png" onError={onImageKitUploadError} onSuccess={onImageKitUploadSuccess}
+                fileName="test-upload.png"
+                onError={onImageKitUploadError}
+                onSuccess={onImageKitUploadSuccess}
+                onUploadStart={onImageKitUploadStart}
                 ref={ikUploadRef}
             />
+            <AlertDialog open={isImageUploading} >
+                <AlertDialogContent className='w-[6rem]'>
+                    <AlertDialogTitle asChild>
+                        <VisuallyHidden>Loading</VisuallyHidden>
+                    </AlertDialogTitle>
+                    <Loader2 className='animate-spin h-10 w-10' />
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }
