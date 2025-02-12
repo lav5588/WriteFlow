@@ -1,12 +1,13 @@
 'use client'
 
+import PaginationComponent from "@/components/PaginationComponent"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { IBlog } from "@/types/blog"
 import axios from "axios"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 import { useEffect, useState } from "react"
 
@@ -34,26 +35,33 @@ const Page:React.FC = () => {
     const router = useRouter();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const searchParams = useSearchParams();
+    const [totalBlogs,setTotalBlogs] = useState<number>(0)
+
+    const fetchData = async () => {
+        try {
+            const params = new URLSearchParams(searchParams)
+            console.log("searchparams: ",searchParams);
+            const response = await axios.get(`/api/blogs${params.toString()== ""?"":'?'+params.toString()}`);
+            const data:IBlog[] = response.data.data;
+            console.log("data: ",response.data);
+            setTotalBlogs(parseInt(response.data.totalBlogs));
+            setData(data);
+        } catch (error) {
+            console.log("Error in fetching data: ", error);
+            toast({
+                variant: "destructive",
+                title:error instanceof Error ?error?.message:"Error in fetching blogs",
+            })
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('/api/blogs');
-                const data:IBlog[] = response.data.data;
-                setData(data);
-            } catch (error) {
-                console.log("Error in fetching data: ", error);
-                toast({
-                    variant: "destructive",
-                    title:error instanceof Error ?error?.message:"Error in fetching blogs",
-                })
-            }
-            finally {
-                setIsLoading(false);
-            }
-        }
         fetchData()
-    }, [])
+    }, [searchParams])
 
     if (isLoading) {
         return <div className="flex justify-center items-center">
@@ -62,7 +70,7 @@ const Page:React.FC = () => {
     }
 
     if (!data || data.length === 0) {
-        return <div>There is no blogs</div>
+        return <div>There is no blogs Found</div>
     }
 
     const handleClick = (slug:string) => {
@@ -86,6 +94,7 @@ const Page:React.FC = () => {
                         </CardContent>
                     </Card>
                 ))}
+                {data && <PaginationComponent totalBlogs = {totalBlogs}/>}
             </div>
         </>
     )
