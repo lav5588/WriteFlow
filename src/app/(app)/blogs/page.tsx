@@ -10,11 +10,11 @@ import { Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 
 
 
-const Page:React.FC = () => {
+const Blogs:React.FC = () => {
     const [data, setData] = useState< IBlog[] >([])
     const router = useRouter();
     const { toast } = useToast();
@@ -81,6 +81,15 @@ const Page:React.FC = () => {
                 {data && <PaginationComponent totalBlogs = {totalBlogs}/>}
             </div>
         </>
+    )
+}
+
+
+const Page:React.FC = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <Blogs />
+        </Suspense>
     )
 }
 
