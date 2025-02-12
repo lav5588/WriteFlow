@@ -11,7 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast"
 import { deleteDraft, publishDraft } from "@/network-call/userProfile.networkCall"
 import { IBlog } from "@/types/blog"
-import { truncateHTML } from "@/app/(app)/blogs/page"
+import { truncateHTML } from "@/lib/truncateHtml"
 
 
 interface IDraftComponentProps{

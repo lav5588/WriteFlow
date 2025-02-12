@@ -9,7 +9,8 @@ import { useSession } from "next-auth/react"
 import { deletePublishedBlog, unPublishThePublishedBlog } from "@/network-call/userProfile.networkCall"
 import { useState } from "react";
 import { IBlog } from "@/types/blog";
-import { truncateHTML } from "@/app/(app)/blogs/page";
+import { truncateHTML } from "@/lib/truncateHtml";
+
 
 
 interface IPublishedComponentProps{
