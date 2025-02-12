@@ -56,7 +56,7 @@ const Published:React.FC<IPublishedComponentProps> = ({ username, publishedData,
             <h1 className="text-center font-extrabold text-3xl mb-5">Published</h1>
             <div className="flex flex-wrap gap-5  justify-center items-center">
                 {publishedData && publishedData?.map((blog) => (
-                    <Card key={blog._id} className="h-[24rem]  w-[20rem]">
+                    <Card key={blog._id} className="h-[26rem]  w-[20rem]">
                         <CardHeader className="flex flex-row justify-between place-items-start">
                             <CardTitle className="leading-6" onClick={() => { handleClick(blog.slug) }}><h5>{blog.title.toUpperCase()}</h5></CardTitle>
                             {session?.data?.user?.username == username && <DropdownMenu>

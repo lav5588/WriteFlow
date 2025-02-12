@@ -66,7 +66,7 @@ const Blogs:React.FC = () => {
             <h1 className="text-center font-extrabold text-3xl mb-5">Blogs</h1>
             <div className="flex flex-wrap gap-2 md:gap-5  justify-center items-center">
                 {data.map((blog) => (
-                    <Card key={blog._id} className="h-[26rem]  w-[20rem]" >
+                    <Card key={blog._id} className="h-[28rem]  w-[20rem]" >
                         <CardHeader>
                             <CardTitle onClick={() => { handleClick(blog.slug) }} className="leading-6 cursor-pointer" ><h5>{blog.title.toUpperCase()}</h5></CardTitle>
                             <p className="text-right"><Link href={`/u/${blog.author.username}`}>~{blog.author.username}</Link></p>

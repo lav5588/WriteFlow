@@ -12,7 +12,7 @@ export async function GET(request: NextRequest){
     try{
         const searchParams = request.nextUrl.searchParams
         let pageNo:number = Number(searchParams.get('pageno')) || 1;
-        const pageSize = Number(searchParams.get('pagesize')) || 10;
+        const pageSize = Number(searchParams.get('pagesize')) || 8;
         // const blogs:IPopulatedPost[] = await PostModel.find({isPublished:true}).skip(pageSize*(pageNo-1)).limit(pageSize).populate<{ author: User }>('author');
         const [totalBlogs, blogs] = await Promise.all([
             PostModel.countDocuments({ isPublished: true }), // Get total count

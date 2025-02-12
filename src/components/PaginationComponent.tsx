@@ -18,7 +18,7 @@ const PaginationComponent = ({ totalBlogs}: { totalBlogs: number }) => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pageno = searchParams.get('pageno') || 1;
-    const pagesize = searchParams.get('pagesize') || 10;
+    const pagesize = searchParams.get('pagesize') || 8;
 
     let arr = [-2, -1, 0, 1, 2];
 
