@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📝 WriteFlow – A Modern Full-Stack Blogging Platform
 
-## Getting Started
+WriteFlow is a feature-rich, full-stack blogging application built with **Next.js** that allows users to write, manage, and publish blog content with ease. Designed with a sleek UI using **ShadCN** and **Tailwind CSS**, WriteFlow integrates a powerful rich-text editor (Tiptap) and supports a complete content management workflow including draft saving, publishing, image uploads (ImageKit integration in progress), and more.
 
-First, run the development server:
+Key highlights of WriteFlow:
+- 🔐 Auth system using **Auth.js** with **Credential Provider** (including password reset via email)
+- 📝 Rich-text editing with **Tiptap**
+- 📄 Blog management (Create, Edit, Save as Draft, Publish/Unpublish, Delete)
+- 🖼️ Image upload support via **ImageKit** *(in progress)*
+- 📧 Password reset via **Resend**
+- ⚡ Server-side pagination for scalability
+- 🌐 Fully responsive & accessible UI using **ShadCN + Tailwind CSS**
+- 🧱 Modular architecture with reusable components
+
+---
+
+## 🚀 Getting Started (Run Locally)
+
+Follow these steps to run WriteFlow on your local machine:
+
+### 1. **Clone the Repository**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/lav5588/WriteFlow
+cd writeflow
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. **Install Dependencies**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. **Configure Environment Variables**
 
-## Learn More
+Create a `.env` file in the root directory and add the following environment variables:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+MONGODB_URI = your_mongodb_connection_url
+NEXTAUTH_SECRET = your_nextauth_secret
+RESEND_API_KEY = your_resend_api_key
+VERIFIED_DOMAIN_ON_RESEND = your_verification_domain
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+CLOUDINARY_CLOUD_NAME = your_cludinary_name
+CLOUDINARY_API_KEY = your_cludinary_api_key
+CLOUDINARY_API_SECRET = your_cludinary_api_secret
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+IMAGEKIT_ID = your_imagekit_id
+NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT = your_imagekit_url_endpoint
+NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY = your_imagekit_public_key
+IMAGEKIT_PRIVATE_KEY = your_imagekit_private_key
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+>⚠️ Make sure to replace these with your actual credentials.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### **Configure the auth.js environment**
+```
+ npx auth secret
+```
+
+### 4. **Run the Development Server**
+
+```
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to see the app in action!
+
+---
+
+## 🧰 Tech Stack
+
+- **Frontend:** Next.js, React.js, Tailwind CSS, ShadCN
+- **Authentication:** Auth.js (Credential Provider)
+- **Editor:** Tiptap
+- **Database:** MongoDB
+- **Email Service:** Resend
+- **Image Uploads:** ImageKit *(integration in progress)*
+
+---
+
+## 📦 Features in Progress
+- 🧹 Blog cleanup and tag categorization
+- 📈 Admin dashboard and analytics
+
+---
